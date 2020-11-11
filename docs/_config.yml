@@ -1,0 +1,6 @@
+remote_theme: carlosperate/jekyll-theme-rtd
+defaults:
+  -
+    values:
+      layout: "defaultAnalytics"
+      baseurl: '/barrage'
