@@ -219,6 +219,14 @@
               <goal>analyze-only</goal>
             </goals>
             <configuration>
+                <ignoredDependencies>
+                    <ignoredDependency>org.apache.arrow:arrow-memory-core:jar:2.0.0</ignoredDependency>
+                    <ignoredDependency>io.grpc:grpc-netty:jar:1.30.2</ignoredDependency>
+                    <ignoredDependency>org.apache.arrow:arrow-format:jar:2.0.0</ignoredDependency>
+                    <ignoredDependency>io.grpc:grpc-core:jar:1.30.2</ignoredDependency>
+                    <ignoredDependency>io.deephaven.barrage:barrage-format:jar:0.1.0-SNAPSHOT</ignoredDependency>
+                    <ignoredDependency>io.grpc:grpc-context:jar:1.30.2</ignoredDependency>
+                </ignoredDependencies>
             </configuration>
           </execution>
         </executions>
