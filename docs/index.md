@@ -25,16 +25,16 @@ Barrage
 Barrage is an extension of Apache Arrow Flight, with a particular focus on
 intermediary data sets that change over time.
 
-We at Deephaven believe that it is Arrow's, and similar projects', drive
-for efficient standards, that enables a lot of the innovation we see in
+We at Deephaven believe that it is Arrow's and similar projects' drive
+for efficient standards that enables a lot of the innovation we see in
 data science.
 
 The way we see data at Deephaven doesn't quite fit into the model that
 Arrow Flight proposes; our tables change over time. We believe that live
-use cases are better served (in latency and throughput) by an iterative
+use cases are better served, both in latency and in throughput, by an iterative
 update model rather than a periodic refresh. See [Motivation](Motivation.md)
 for more information.
 
 Barrage introduces a new ArrowMessage header type, the `BarrageRecordBatch`.
-Inside contains all of the information needed to apply the update model. See
+This header contains all of the information needed to apply the update model. See
 [Concepts](Concepts.md) for more information on the update model.

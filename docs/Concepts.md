@@ -27,18 +27,25 @@ Key Space
 
 To effectively communicate changes to rows of a table, we need a way to
 consistently and uniquely identify them. Additionally, our operations
-often depend on input ordering or output ordering. Thus, we map rows for
-a given table to the range `[0, Long.MAX_VALUE]`. Adjacent rows are not
-guaranteed to be adjacent in key-space. In fact, this mapping can change
-without any of the data in the row changing.
+often are dependent on ordering of the parent table and/or produce a well-defined
+output ordering. Keyspace can be thought of as a set of ordered longs
+(non-negative and no larger than `2^63-1`). As the table ticks, rows are
+added, removed, or even shifted within the keyspace. See the "Update Model"
+section below for more information on how a keyspace may change over time.
 
 Position Space
 --------------
 
 If a table has `n` rows then it has a position space of `[0, n)`. This is
 an alternative naming for the rows in the table. However, which row is the
-ith row depends on the context and current state of the table. The function
-`i => key_i` for i in `[0, n)` maps from positon space to key space.
+`i`th row depends on the context and current state of the table.
+
+For example, let table T be defined by the set of rows with keys
+`[0, 9], [100, 109], and [180, 189]`. In position space you can identify this
+set as `[0, 29]`. Suppose that table T ticks and now is defined
+by the set of rows with keys `[0, 9], [100, 109], and [310, 319]`. This is
+still identified in position space as `[0, 29]`, however the 30th position-space
+element now refers to key `319` instead of key `189`.
 
 Viewport
 --------
@@ -49,8 +56,8 @@ data is destined for a human-facing widget then you may only need a slice
 of the data. We call these slices viewports.
 
 Viewports are in position space because:
-- difficult to synchronize with the server as the keyspace may vary tick to tick
-- the api more closely resembles a pagination over `n` records
+- they are difficult to synchronize with the server as the keyspace may vary tick to tick.
+- the api more closely resembles a pagination over `n` records.
 
 Index
 -----
@@ -58,7 +65,7 @@ Index
 An Index is an ordered set of rows and may represent either the table's key-space
 or the table's position-space.
 
-Indexes have a variety of uses:
+Indexes have a variety of uses. They:
 - describe which rows exist in a table (key-space)
 - describe which rows were added/removed/modified in a table (key-space)
 - describe a viewport (position-space)
@@ -67,8 +74,8 @@ IndexShiftData
 --------------
 
 Some operations need to be able to rearrange the keyspace to accommodate
-changes in data. For example, a sort may need to move rows that are adjancent in
-keyspace out of the way to accommodate a newly inserting row that sorts
+changes in data. For example, a sort may need to move rows that are adjacent in
+keyspace out of the way to accommodate a newly inserted row that sorts
 directly between them. When rows change in keyspace, we communicate these
 changes independently from additions, removals, and modifications.
 
@@ -76,7 +83,7 @@ We call a single transformation a `shift`. A shift is defined by a `start`, `end
 and `delta`. All rows in the range `[start, end]` (inclusive) change in key-space by
 `delta` and are now located  at `[start + delta, end + delta]`.
 
-Things get pretty tricky quickly, for practical reasons, there are a few restrictions:
+Things get pretty tricky quickly. For practical reasons, there are a few restrictions:
 - shift origins are not allowed to overlap in pre-shift keyspace
 - shift destinations are not allowed to overlap in post-shift keyspace
 - shifts are unable to alter the ordering of rows in position space
@@ -138,5 +145,5 @@ Imagine the scenario:
 4. The client now has data in position space `[80, 179]`; the server must send the missing `[180, 199]`.
 
 We call these rows `scoped` rows. They are integrated with `added` rows in an update,
-but are distinguishable via the `addedRowsIncluded` field. See the [Wire Guide](WireGuide.md)
-for more details.
+but are distinguishable via the `addedRowsIncluded` field included in the `BarrageRecordBatch`.
+See the [Wire Guide](WireGuide.md) for more details.
