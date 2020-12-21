@@ -20,7 +20,7 @@ include "SparseTensor.fbs";
 include "Tensor.fbs";
 include "Barrage.fbs";
 
-namespace org.apache.arrow.flatbuf;
+namespace io.deephaven.barrage.flatbuf;
 
 /// ----------------------------------------------------------------------
 /// Data structures for describing a table row batch (a collection of
@@ -132,7 +132,7 @@ union MessageHeader {
 }
 
 table Message {
-  version: org.apache.arrow.flatbuf.MetadataVersion;
+  version: io.deephaven.barrage.flatbuf.MetadataVersion;
   header: MessageHeader;
   bodyLength: long;
   custom_metadata: [ KeyValue ];

@@ -20,7 +20,7 @@
 
 include "Tensor.fbs";
 
-namespace org.apache.arrow.flatbuf;
+namespace io.deephaven.barrage.flatbuf;
 
 /// ----------------------------------------------------------------------
 /// EXPERIMENTAL: Data structures for sparse tensors

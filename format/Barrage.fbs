@@ -92,8 +92,8 @@ table BarrageRecordBatch {
   ///
   /// The number of buffers appended to this list depends on the schema and which nodes were included in the update.
   /// Refer to Arrow Flight's specification for buffer schema.
-  buffers: [org.apache.arrow.flatbuf.Buffer];
+  buffers: [io.deephaven.barrage.flatbuf.Buffer];
 
   /// Optional compression of the message body
-  compression: org.apache.arrow.flatbuf.BodyCompression;
+  compression: io.deephaven.barrage.flatbuf.BodyCompression;
 }

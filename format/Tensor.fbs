@@ -21,7 +21,7 @@
 
 include "Schema.fbs";
 
-namespace org.apache.arrow.flatbuf;
+namespace io.deephaven.barrage.flatbuf;
 
 /// ----------------------------------------------------------------------
 /// Data structures for dense tensors

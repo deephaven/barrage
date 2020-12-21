@@ -17,7 +17,7 @@
 
 /// Logical types, vector layouts, and schemas
 
-namespace org.apache.arrow.flatbuf;
+namespace io.deephaven.barrage.flatbuf;
 
 enum MetadataVersion:short {
   /// 0.1.0 (October 2016).
