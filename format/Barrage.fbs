@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include "Message.fbs";
+include "Schema.fbs";
 
 namespace io.deephaven.barrage.flatbuf;
 
@@ -94,6 +94,6 @@ table BarrageRecordBatch {
   /// Refer to Arrow Flight's specification for buffer schema.
   buffers: [io.deephaven.barrage.flatbuf.Buffer];
 
-  /// Optional compression of the message body
-  compression: io.deephaven.barrage.flatbuf.BodyCompression;
+//  /// Optional compression of the message body
+//  compression: io.deephaven.barrage.flatbuf.BodyCompression;
 }
