@@ -1,0 +1,25 @@
+name: Package CI
+
+on:
+  pull_request:
+    branches: [ 'main' ]
+  push:
+    branches: [ 'main' ]
+
+jobs:
+  barrage:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          # The maven git-commit-id-plugin needs the history
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.282'
+
+      - name: Package with Maven
+        run: mvn --file java/pom.xml --batch-mode package
