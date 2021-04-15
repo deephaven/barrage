@@ -1,0 +1,50 @@
+{
+  "name": "@deephaven/barrage",
+  "version": "0.1.0",
+  "description": "Deephaven Barrage protocol",
+  "main": "dist/barrage.js",
+  "types": "dist/typings/index.d.ts",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build": "npm run clean && ./generateSchemas.sh && webpack",
+    "prepublishOnly": "npm run build",
+    "tsc": "tsc --traceResolution -p tsconfig.json"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "author": "Deephaven Data Labs",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deephaven/barrage"
+  },
+  "keywords": [
+    "barrage",
+    "flatbuffers",
+    "arrow",
+    "protobuf",
+    "typescript",
+    "ts"
+  ],
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "flatbuffers": "^1.12.0"
+  },
+  "peerDependencies": {
+    "google-protobuf": "^3.2.0",
+    "flatbuffers": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.2.5",
+    "@types/node": "^7.0.5",
+    "@types/flatbuffers": "^1.10.0",
+    "google-protobuf": "^3.2.0",
+    "ts-loader": "^6.0.1",
+    "typescript": "3.5.1",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
+  }
+}
