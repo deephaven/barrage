@@ -26,14 +26,4 @@ module.exports = [{
         globalObject: 'this',
     }
 },
-    // {
-    //     name: 'lib-umd',
-    //     ...LIB_BASE_CONFIG,
-    //     output: {
-    //         filename: `barrage.umd.js`,
-    //         path: DIST_DIR,
-    //         libraryTarget: 'umd',
-    //         globalObject: 'this',
-    //     }
-    // },
 ];
