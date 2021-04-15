@@ -97,3 +97,12 @@ table BarrageRecordBatch {
 //  /// Optional compression of the message body
 //  compression: io.deephaven.barrage.flatbuf.BodyCompression;
 }
+
+/// App Metadata for a Flight DoPut
+table BarragePutMetadata {
+  /// the ticket to reference an out-of-band DoPut (for JS clients that cannot support client-streams)
+  rpcTicket: [byte];
+
+  /// the sequence of this piece of the DoPut; to support out-of-order RPCs for an out-of-band DoPut
+  sequence: long;
+}
