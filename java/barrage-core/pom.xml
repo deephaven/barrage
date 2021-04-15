@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!---
+<!--
   Copyright 2020 Deephaven Data Labs
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
   <parent>
     <groupId>io.deephaven.barrage</groupId>
     <artifactId>barrage-java-root</artifactId>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -29,18 +29,12 @@
   <packaging>jar</packaging>
 
   <properties>
-    <dep.arrow.version>2.0.0</dep.arrow.version>
     <dep.grpc.version>1.30.2</dep.grpc.version>
     <dep.protobuf.version>3.7.1</dep.protobuf.version>
     <forkCount>1</forkCount>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>io.deephaven.barrage</groupId>
-      <artifactId>barrage-format</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
       <artifactId>grpc-core</artifactId>
@@ -202,9 +196,7 @@
             </goals>
             <configuration>
                 <ignoredDependencies>
-                    <ignoredDependency>org.apache.arrow:arrow-memory-core:jar:2.0.0</ignoredDependency>
                     <ignoredDependency>io.grpc:grpc-core:jar:1.30.2</ignoredDependency>
-                    <ignoredDependency>io.deephaven.barrage:barrage-format:jar:0.0.9-SNAPSHOT</ignoredDependency>
                     <ignoredDependency>io.grpc:grpc-context:jar:1.30.2</ignoredDependency>
                 </ignoredDependencies>
             </configuration>
