@@ -10,9 +10,6 @@
     "prepublishOnly": "npm run build",
     "tsc": "tsc --traceResolution -p tsconfig.json"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "author": "Deephaven Data Labs",
   "license": "Apache-2.0",
   "repository": {
