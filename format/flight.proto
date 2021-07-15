@@ -41,6 +41,15 @@ service FlightService {
   rpc Handshake(stream HandshakeRequest) returns (stream HandshakeResponse) {}
 
   /*
+   * Handshake between client and server. Depending on the server, the
+   * handshake may be required to determine the token that should be used for
+   * future operations. In this variant, the client is unable to stream. If they
+   * are required to stream, then the payload may include additional information
+   * to establish a virtual stream from the client.
+   */
+  rpc HandshakeNoClientStream(HandshakeRequest) returns (stream HandshakeResponse) {}
+
+  /*
    * Get a list of available streams given a particular criteria. Most flight
    * services will expose one or more streams that are readily available for
    * retrieval. This api allows listing the streams available for
