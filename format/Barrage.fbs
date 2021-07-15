@@ -134,19 +134,11 @@ table BarrageUpdateMetadata {
   /// This is an encoded IndexShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
-  /// This is an encoded bitset of added columns that are included in this update; it will match the most
-  /// recently received effectiveColumnSet.
-  added_column_set: [byte];
-
-  /// This is an encoded bitset of modified columns that are included in this update. If this is a
-  /// snapshot, then this bitset will be empty.
-  modified_column_set: [byte];
-
-  /// This is an encoded Index of rows that were included with this update
+  /// This is an encoded Index of rows that were included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
   added_rows_included: [byte];
 
-  /// The list of modified column data are the modified indices for each modified column indicated in modified column set.
+  /// The list of modified column data are in the same order as the field nodes on the schema.
   nodes: [BarrageModColumnMetadata];
 }
