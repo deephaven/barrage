@@ -85,9 +85,6 @@ table BarrageSubscriptionRequest {
   /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
   update_interval_ms: int64;
 
-  /// Ticket to export this subscription request for out-of-band updates.
-  export_ticket: [byte];
-
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
   use_deephaven_nulls: bool;
