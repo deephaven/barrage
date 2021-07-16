@@ -26,7 +26,7 @@ Key Space
 ---------
 
 To effectively communicate changes to rows of a table, we need a way to
-consistently and uniquely identify them. Additionally, our operations
+identify them. Our operations
 often are dependent on ordering of the parent table and/or produce a well-defined
 output ordering. Keyspace can be thought of as a set of ordered longs
 (non-negative and no larger than `2^63-1`). As the table ticks, rows are

@@ -25,7 +25,7 @@
 
   <groupId>io.deephaven.barrage</groupId>
   <artifactId>barrage-java-root</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Deephaven Data Labs' Barrage Java Root POM</name>
@@ -36,8 +36,7 @@
     <target.gen.source.path>${project.basedir}/target/generated-sources</target.gen.source.path>
     <dep.fbs.version>1.12.0</dep.fbs.version>
     <dep.flatc.version>1.12.0</dep.flatc.version>
-    <dep.arrow.version>2.0.0</dep.arrow.version>
-    <dep.guava.version>20.0</dep.guava.version>
+    <dep.arrow.version>4.0.1</dep.arrow.version>
     <forkCount>2</forkCount>
     <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
   </properties>
@@ -467,11 +466,6 @@
         <artifactId>flatbuffers-java</artifactId>
         <version>${dep.fbs.version}</version>
       </dependency>
-          <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${dep.guava.version}</version>
-          </dependency>
     </dependencies>
   </dependencyManagement>
 
