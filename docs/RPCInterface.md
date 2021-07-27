@@ -68,6 +68,8 @@ enum BarrageMessageType : byte {
   // for subscription parsing/management
   BarrageSubscriptionRequest = 4,
   BarrageUpdateMetadata = 5,
+
+  // enum values greater than 127 are reserved for custom client use
 }
 
 /// The message wrapper used for all barrage app_metadata fields.
@@ -121,12 +123,12 @@ table BarrageSubscriptionRequest {
   /// The bitset of columns to subscribe to. An empty bitset unsubscribes from all columns.
   columns: [byte];
 
-  /// This is an encoded Index of rows in position-space to subscribe to.
+  /// This is an encoded and compressed Index of rows in position-space to subscribe to.
   viewport: [byte];
 
   /// Explicitly set the update interval for this subscription. Note that subscriptions with different update intervals
   /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
-  update_interval_ms: int64;
+  update_interval_ms: long;
 
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
@@ -135,7 +137,7 @@ table BarrageSubscriptionRequest {
 
 /// Holds all of the index data structures for the column being modified.
 table BarrageModColumnMetadata {
-  /// This is an encoded Index of rows for this column (within the viewport) that were modified.
+  /// This is an encoded and compressed Index of rows for this column (within the viewport) that were modified.
   /// There is no notification for modifications outside of the viewport.
   modified_rows: [byte];
 }
@@ -159,22 +161,22 @@ table BarrageUpdateMetadata {
   is_snapshot: bool;
 
   /// If this is a snapshot and the subscription is a viewport, then the effectively subscribed viewport
-  /// will be included in the payload. It is an encoded Index.
+  /// will be included in the payload. It is an encoded and compressed Index.
   effective_viewport: [byte];
 
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
 
-  /// This is an encoded Index of rows that were added in this update.
+  /// This is an encoded and compressed Index of rows that were added in this update.
   added_rows: [byte];
 
-  /// This is an encoded Index of rows that were removed in this update.
+  /// This is an encoded and compressed Index of rows that were removed in this update.
   removed_rows: [byte];
 
-  /// This is an encoded IndexShiftData describing how the keyspace of unmodified rows changed.
+  /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
-  /// This is an encoded Index of rows that were included with this update.
+  /// This is an encoded and compressed Index of rows that were included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
   added_rows_included: [byte];
