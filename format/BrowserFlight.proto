@@ -1,0 +1,65 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package io.deephaven.flightjs.protocol;
+
+import "Flight.proto"
+
+/*
+ * A flight js service is a (non-proper) extension of arrow flight service
+ * that augments existing client-streaming (or bidirectional streaming) methods
+ * with a pair that can be used to simulate a client stream over unary requests.
+ */
+service BrowserFlightService {
+
+  /*
+   * Handshake between client and server. Depending on the server, the
+   * handshake may be required to determine the token that should be used for
+   * future operations. Both request and response are streams to allow multiple
+   * round-trips depending on auth mechanism.
+   */
+  rpc OpenHandshake(HandshakeRequest) returns (stream HandshakeResponse) {}
+  rpc NextHandshake(HandshakeRequest) returns (BrowserNextResponse) {}
+
+  /*
+   * Push a stream to the flight service associated with a particular
+   * flight stream. This allows a client of a flight service to upload a stream
+   * of data. Depending on the particular flight service, a client consumer
+   * could be allowed to upload a single stream per descriptor or an unlimited
+   * number. In the latter, the service might implement a 'seal' action that
+   * can be applied to a descriptor once all streams are uploaded.
+   */
+  rpc OpenDoPut(FlightData) returns (stream PutResult) {}
+  rpc NextDoPut(FlightData) returns (BrowserNextResponse) {}
+
+  /*
+   * Open a bidirectional data channel for a given descriptor. This
+   * allows clients to send and receive arbitrary Arrow data and
+   * application-specific metadata in a single logical stream. In
+   * contrast to DoGet/DoPut, this is more suited for clients
+   * offloading computation (rather than storage) to a Flight service.
+   */
+  rpc OpenDoExchange(FlightData) returns (stream FlightData) {}
+  rpc NextDoExchange(FlightData) returns (BrowserNextResponse) {}
+}
+
+message BrowserNextResponse {
+  bytes app_metadata = 1;
+}

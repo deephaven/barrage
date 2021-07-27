@@ -15,16 +15,21 @@
 namespace io.deephaven.barrage.flatbuf;
 
 enum BarrageMessageType : byte {
+  /// A barrage message wrapper might send a None message type
+  /// if the msg_payload is empty. This is helpful for browser clients
+  /// that must send all client-streaming messages out-of-band
+  /// (note: browsers do not support client-streaming gRPCs)
   None = 0,
 
-  // for session management
+  /// for session management
   NewSessionRequest = 1,
   RefreshSessionRequest = 2,
   SessionInfoResponse = 3,
 
-  // for subscription parsing/management
-  BarrageSubscriptionRequest = 4,
-  BarrageUpdateMetadata = 5,
+  /// for subscription parsing/management (aka DoGet, DoPush, DoExchange)
+  BarrageSerializationOptions = 4,
+  BarrageSubscriptionRequest = 5,
+  BarrageUpdateMetadata = 6,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -51,12 +56,16 @@ table BarrageMessageWrapper {
 
 /// Establish a new session.
 table NewSessionRequest {
-  /// empty for future compatibility
+  /// A nested protocol version (gets delegated to handshake)
+  protocol_version: uint;
+
+  /// Arbitrary auth/handshake info.
+  payload: [byte];
 }
 
 /// Refresh the provided session.
 table RefreshSessionRequest {
-  /// this session token is only required if it is the first request of an rpc stream
+  /// this session token is only required if it is the first request of a handshake rpc stream
   session: [byte];
 }
 
@@ -72,6 +81,21 @@ table SessionInfoResponse {
   token_refresh_deadline_ms: long;
 }
 
+/// There will always be types that cannot be easily supported over IPC. These are the options:
+///   Stringify (default) - Pretend the column is a string when sending over Arrow Flight (default)
+///   JavaSerialization   - Use java serialization; the client is responsible for the deserialization
+///   ThrowError          - Refuse to send the column and throw an internal error sharing as much detail as possible
+enum ColumnConversionMode : byte { Stringify = 1, JavaSerialization, ThrowError }
+
+table BarrageSerializationOptions {
+  /// see enum for details
+  columnConversionMode: ColumnConversionMode = Stringify;
+
+  /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
+  /// by eliminating the additional complexity of the validity buffer.
+  use_deephaven_nulls: bool;
+}
+
 /// Describes the subscription the client would like to acquire.
 table BarrageSubscriptionRequest {
   /// Ticket for the source data set.
@@ -85,11 +109,13 @@ table BarrageSubscriptionRequest {
 
   /// Explicitly set the update interval for this subscription. Note that subscriptions with different update intervals
   /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
+  /// Setting this field does not guarantee updates will be received at this frequency.
+  ///
+  /// Note: if not supplied (default of zero) then the server uses a consistent value to be efficient and fair to all clients
   update_interval_ms: long;
 
-  /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
-  /// by eliminating the additional complexity of the validity buffer.
-  use_deephaven_nulls: bool;
+  /// Optionally enable/disable special serialization features.
+  serialization_options: BarrageSerializationOptions;
 }
 
 /// Holds all of the index data structures for the column being modified.
