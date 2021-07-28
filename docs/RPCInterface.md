@@ -89,12 +89,16 @@ table BarrageMessageWrapper {
   /// The msg payload.
   msg_payload: [byte];
 
-  /// Used in client-side requests to tie this message to an export id so that it can be referenced in future out-of-band methods.
-  /// Not required if using a client-streaming rpc.
+  /// Simulated Client Streaming Parameters (not required for regular client-only / bidirectional streams)
+
+  /// this ticket is used to find the stream in the session
   rpc_ticket: [byte];
 
-  /// Used in client-side requests to sequence this message w.r.t. other messages sent to the same rpcTicket. Not required if using a client-streaming rpc.
+  /// if messages are received out of sequence they get queued
   sequence: long;
+
+  /// after processing this message tell the server to close the stream and to release the rpc_ticket
+  halfCloseAfterMessage: boolean;
 }
 
 /// Establish a new session.
