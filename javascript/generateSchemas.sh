@@ -11,4 +11,4 @@ if [ -z "$FLATC" ]; then
 fi
 
 # invoke flatc
-${FLATC} --ts --no-fb-import --no-ts-reexport -o generated/ ../format/Barrage.fbs ../format/Schema.fbs ../format/Message.fbs ../format/Tensor.fbs ../format/SparseTensor.fbs
+${FLATC} --ts --no-fb-import --no-ts-reexport -o generated/ ../format/Barrage.fbs
