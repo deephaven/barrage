@@ -136,7 +136,7 @@ enum ColumnConversionMode : byte { Stringify = 1, JavaSerialization, ThrowError 
 
 table BarrageSerializationOptions {
   /// see enum for details
-  columnConversionMode: ColumnConversionMode = Stringify;
+  column_conversion_mode: ColumnConversionMode = Stringify;
 
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
