@@ -98,7 +98,7 @@ table BarrageMessageWrapper {
   sequence: long;
 
   /// after processing this message tell the server to close the stream and to release the rpc_ticket
-  halfCloseAfterMessage: boolean;
+  half_close_after_message: boolean;
 }
 
 /// Establish a new session.
