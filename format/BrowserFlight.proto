@@ -20,7 +20,7 @@ syntax = "proto3";
 
 package io.deephaven.flightjs.protocol;
 
-import "Flight.proto"
+import "Flight.proto";
 
 /*
  * A flight js service is a (non-proper) extension of arrow flight service
@@ -35,8 +35,8 @@ service BrowserFlightService {
    * future operations. Both request and response are streams to allow multiple
    * round-trips depending on auth mechanism.
    */
-  rpc OpenHandshake(HandshakeRequest) returns (stream HandshakeResponse) {}
-  rpc NextHandshake(HandshakeRequest) returns (BrowserNextResponse) {}
+  rpc OpenHandshake(arrow.flight.protocol.HandshakeRequest) returns (stream arrow.flight.protocol.HandshakeResponse) {}
+  rpc NextHandshake(arrow.flight.protocol.HandshakeRequest) returns (BrowserNextResponse) {}
 
   /*
    * Push a stream to the flight service associated with a particular
@@ -46,8 +46,8 @@ service BrowserFlightService {
    * number. In the latter, the service might implement a 'seal' action that
    * can be applied to a descriptor once all streams are uploaded.
    */
-  rpc OpenDoPut(FlightData) returns (stream PutResult) {}
-  rpc NextDoPut(FlightData) returns (BrowserNextResponse) {}
+  rpc OpenDoPut(arrow.flight.protocol.FlightData) returns (stream arrow.flight.protocol.PutResult) {}
+  rpc NextDoPut(arrow.flight.protocol.FlightData) returns (BrowserNextResponse) {}
 
   /*
    * Open a bidirectional data channel for a given descriptor. This
@@ -56,8 +56,8 @@ service BrowserFlightService {
    * contrast to DoGet/DoPut, this is more suited for clients
    * offloading computation (rather than storage) to a Flight service.
    */
-  rpc OpenDoExchange(FlightData) returns (stream FlightData) {}
-  rpc NextDoExchange(FlightData) returns (BrowserNextResponse) {}
+  rpc OpenDoExchange(arrow.flight.protocol.FlightData) returns (stream arrow.flight.protocol.FlightData) {}
+  rpc NextDoExchange(arrow.flight.protocol.FlightData) returns (BrowserNextResponse) {}
 }
 
 message BrowserNextResponse {
