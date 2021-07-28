@@ -36,7 +36,7 @@
     <target.gen.source.path>${project.basedir}/target/generated-sources</target.gen.source.path>
     <dep.fbs.version>1.12.0</dep.fbs.version>
     <dep.flatc.version>1.12.0</dep.flatc.version>
-    <dep.arrow.version>4.0.1</dep.arrow.version>
+    <dep.arrow.version>5.0.0</dep.arrow.version>
     <dep.guava.version>30.1-jre</dep.guava.version>
     <forkCount>2</forkCount>
     <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
