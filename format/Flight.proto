@@ -91,20 +91,6 @@ service FlightService {
   rpc DoPut(stream FlightData) returns (stream PutResult) {}
 
   /*
-   * Identical to DoPut, but supports a browser pattern where client-streams are unavailable.
-   * This establishes a new DoPut stream that supports out-of-band updates. The app_metadata is used
-   * to coordinate the stream contents; including when the initial stream should be considered closed.
-   */
-  rpc DoPutOOBClientStream(FlightData) returns (stream PutResult) {}
-
-  /*
-   * Identical to DoPut, but supports a browser pattern where client-streams are unavailable.
-   * This appends an out-of-band update to an existing DoPut stream. The app_metadata is used
-   * to coordinate the stream contents; including when the initial stream should be considered closed.
-   */
-  rpc DoPutOOBClientStreamUpdate(FlightData) returns (OOBPutResult) {}
-
-  /*
    * Open a bidirectional data channel for a given descriptor. This
    * allows clients to send and receive arbitrary Arrow data and
    * application-specific metadata in a single logical stream. In
@@ -112,20 +98,6 @@ service FlightService {
    * offloading computation (rather than storage) to a Flight service.
    */
   rpc DoExchange(stream FlightData) returns (stream FlightData) {}
-
-  /*
-   * Identical to DoExchange, but supports a browser pattern where client-streams are unavailable.
-   * This establishes a new DoExchange stream that supports out-of-band updates. The app_metadata is used
-   * to coordinate the stream contents; including when the initial stream should be considered closed.
-   */
-  rpc DoExchangeOOBClientStream(FlightData) returns (stream FlightData) {}
-
-  /*
-   * Identical to DoExchange, but supports a browser pattern where client-streams are unavailable.
-   * This establishes a new DoExchange stream that supports out-of-band updates. The app_metadata is used
-   * to coordinate the stream contents; including when the initial stream should be considered closed.
-   */
-  rpc DoExchangeOOBClientStreamUpdate(FlightData) returns (OOBExchangeResult) {}
 
   /*
    * Flight services can support an arbitrary number of simple actions in
@@ -355,23 +327,9 @@ message FlightData {
   bytes data_body = 1000;
 }
 
-/*
+/**
  * The response message associated with the submission of a DoPut.
  */
 message PutResult {
   bytes app_metadata = 1;
-}
-
-/*
- * The response message associated with the submission of a DoPutOOBClientStreamUpdate.
- */
-message OOBPutResult {
-  // intentionally empty; the original PutResult stream is responded to
-}
-
-/*
- * The response message associated with the submission of a DoExchangeOOBClientStreamUpdate.
- */
-message OOBExchangeResult {
-  // intentionally empty; the original PutResult stream is responded to
 }

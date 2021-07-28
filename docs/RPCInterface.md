@@ -22,216 +22,196 @@ nav_order: 4
 RPC Interface
 =============
 
-Barrage is an RPC framework for high-performance data services based on Arrow data,
+Barrage is an RPC interface for high-performance data services based on Arrow,
 for ticking data sets built on top of gRPC.
 
 Barrage is an extension of Apache Arrow Flight. The extension works by sending
-`BarrageRecordBatch` messages instead of `RecordBatch` messages. Structurally, the
-messages look very similar, but a BarrageRecordBatch requires a series of steps to
-be performed to ensure that local state is updated appropriately to reflect the
-remote table.
+additional metadata via the `app_metadata` field on `FlightData`. This metadata
+is used to communicate the necessary additional information between server
+and client. These types are flatbuffers, so that we may more easily lift the
+`app_metadata` into the `RecordBatch` flatbuffer once Arrow supports byte-array
+metadata, at that layer.
 
-`DoSubscribe` is a new BarrageService rpc. It is similar to `DoGet` in that it is
-how a client gets access to the data in the table, but instead of only receiving the
-set of existing data a barrage subscription will also is also receive future updates.
+The main subscription mechanism is initiated via a `DoExchange`. The client
+sends a SubscriptionRequest (or as many as they like) and the server sends
+barrage updates to satisfy their subscription's requirements.
 
-
-Protocol Buffer Definitions
----------------------------
-
-```proto
-/*
- * A barrage service is an endpoint for retrieving or storing ticking Arrow data.
- * Implementations should also implement FlightService.
- */
-service BarrageService {
-
-  /*
-   * Create a table subscription. You can send a new request to update the subscription.
-   */
-  rpc DoSubscribe(stream SubscriptionRequest) returns (stream BarrageData) {}
-
-}
-*/
-
-/*
- * An opaque identifier that the service can use to retrieve a particular
- * portion of a stream.
- */
-message Ticket {
-  bytes ticket = 1;
-}
-
-/*
- * A batch of Arrow data as part of a stream of batches.
- */
-message BarrageData {
-
-  /*
-   * The descriptor of the data. This is only relevant when a client is
-   * starting a new DoPut stream.
-   */
-  BarrageDescriptor barrage_descriptor = 1;
-
-  /*
-   * Header for message data as described in Message.fbs::Message.
-   */
-  bytes data_header = 2;
-
-  /*
-   * Application-defined metadata.
-   */
-  bytes app_metadata = 3;
-
-  /*
-   * The actual batch of Arrow data. Preferably handled with minimal-copies
-   * coming last in the definition to help with sidecar patterns (it is
-   * expected that some implementations will fetch this field off the wire
-   * with specialized code to avoid extra memory copies).
-   */
-  bytes data_body = 1000;
-}
-
-message SubscriptionRequest {
-  // The ticket identifying this data set.
-  Ticket ticket = 1;
-
-  // A bitset of columns to subscribe to. An empty bitset unsubscribes from everything.
-  bytes columns = 2;
-
-  // The viewport in position-space of rows to subscribe to. An empty viewport empties the viewport. You will only
-  // receive index updates.
-  bytes viewport = 3;
-
-  // Use field ID >= 20 for any custom subscription parameters.
-}
-
-/*
- * The name or tag for a Flight. May be used as a way to retrieve or generate
- * a flight or be used to expose a set of previously defined flights.
- */
-message BarrageDescriptor {
-
-  /*
-   * Describes what type of descriptor is defined.
-   */
-  enum DescriptorType {
-
-    // Protobuf pattern, not used.
-    UNKNOWN = 0;
-
-    /*
-     * A named path that identifies a dataset. A path is composed of a string
-     * or list of strings describing a particular dataset. This is conceptually
-     *  similar to a path inside a filesystem.
-     */
-    PATH = 1;
-
-    /*
-     * An opaque command to generate a dataset.
-     */
-    CMD = 2;
-  }
-
-  DescriptorType type = 1;
-
-  /*
-   * Opaque value used to express a command. Should only be defined when
-   * type = CMD.
-   */
-  bytes cmd = 2;
-
-  /*
-   * List of strings identifying a particular dataset. Should only be defined
-   * when type = PATH.
-   */
-  repeated string path = 3;
-}
-```
 
 Flat Buffer Definitions
 -----------------------
 
 ```fbs
-/// ----------------------------------------------------------------------
-/// Data structures for describing a barrage row batch (an update to a ticking table).
+// Copyright 2020 Deephaven Data Labs
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-/// Metadata about a field at some level of a nested type tree (but not
-/// its children).
-///
-/// This is similar to arrow's FieldNode, with additional fields to support modified rows.
-table BarrageFieldNode {
-  /// The number of value slots in the Arrow array at this level of a nested
-  /// tree.
-  length: long;
+namespace io.deephaven.barrage.flatbuf;
 
-  /// The number of observed nulls. Fields with null_count == 0 may choose not
-  /// to write their physical validity bitmap out as a materialized buffer,
-  /// instead setting the length of the bitmap buffer to 0.
-  null_count: long;
+enum BarrageMessageType : byte {
+  /// A barrage message wrapper might send a None message type
+  /// if the msg_payload is empty. This is helpful for browser clients
+  /// that must send all client-streaming messages out-of-band
+  /// (note: browsers do not support client-streaming gRPCs)
+  None = 0,
 
-  /// If this field node is for an outer-most modified column then these fields may be included:
+  /// for session management
+  NewSessionRequest = 1,
+  RefreshSessionRequest = 2,
+  SessionInfoResponse = 3,
 
-  /// This is an encoded Index of rows for this column that were modified:
-  modifiedRows: [byte];
+  /// for subscription parsing/management (aka DoGet, DoPush, DoExchange)
+  BarrageSerializationOptions = 4,
+  BarrageSubscriptionRequest = 5,
+  BarrageUpdateMetadata = 6,
 
-  /// If this is a viewport, this is an encoded Index of rows for this column that were included in the buffer.
-  includedRows: [byte];
+  // enum values greater than 127 are reserved for custom client use
+}
+
+/// The message wrapper used for all barrage app_metadata fields.
+table BarrageMessageWrapper {
+  /// Used to identify this type of app_metadata vs other applications.
+  /// The magic value is '0x6E687064'. It is the numerical representation of the ASCII "dhvn".
+  magic: uint;
+
+  /// The msg type being sent.
+  msg_type: BarrageMessageType;
+
+  /// The msg payload.
+  msg_payload: [byte];
+
+  /// Simulated Client Streaming Parameters (not required for regular client-only / bidirectional streams)
+
+  /// this ticket is used to find the stream in the session
+  rpc_ticket: [byte];
+
+  /// if messages are received out of sequence they get queued
+  sequence: long;
+
+  /// after processing this message tell the server to close the stream and to release the rpc_ticket
+  half_close_after_message: boolean;
+}
+
+/// Establish a new session.
+table NewSessionRequest {
+  /// A nested protocol version (gets delegated to handshake)
+  protocol_version: uint;
+
+  /// Arbitrary auth/handshake info.
+  payload: [byte];
+}
+
+/// Refresh the provided session.
+table RefreshSessionRequest {
+  /// this session token is only required if it is the first request of a handshake rpc stream
+  session: [byte];
+}
+
+/// Information about the current session state.
+table SessionInfoResponse {
+  /// this is the metadata header to identify this session with future requests; it must be lower-case and remain static for the life of the session
+  metadata_header: [byte];
+
+  /// this is the session_token; note that it may rotate
+  session_token: [byte];
+
+  /// a suggested time for the user to refresh the session if they do not do so earlier; value is denoted in milliseconds since epoch
+  token_refresh_deadline_ms: long;
+}
+
+/// There will always be types that cannot be easily supported over IPC. These are the options:
+///   Stringify (default) - Pretend the column is a string when sending over Arrow Flight (default)
+///   JavaSerialization   - Use java serialization; the client is responsible for the deserialization
+///   ThrowError          - Refuse to send the column and throw an internal error sharing as much detail as possible
+enum ColumnConversionMode : byte { Stringify = 1, JavaSerialization, ThrowError }
+
+table BarrageSerializationOptions {
+  /// see enum for details
+  column_conversion_mode: ColumnConversionMode = Stringify;
+
+  /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
+  /// by eliminating the additional complexity of the validity buffer.
+  use_deephaven_nulls: bool;
+}
+
+/// Describes the subscription the client would like to acquire.
+table BarrageSubscriptionRequest {
+  /// Ticket for the source data set.
+  ticket: [byte];
+
+  /// The bitset of columns to subscribe to. An empty bitset unsubscribes from all columns.
+  columns: [byte];
+
+  /// This is an encoded and compressed Index of rows in position-space to subscribe to.
+  viewport: [byte];
+
+  /// Explicitly set the update interval for this subscription. Note that subscriptions with different update intervals
+  /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
+  /// Setting this field does not guarantee updates will be received at this frequency.
+  ///
+  /// Note: if not supplied (default of zero) then the server uses a consistent value to be efficient and fair to all clients
+  update_interval_ms: long;
+
+  /// Optionally enable/disable special serialization features.
+  serialization_options: BarrageSerializationOptions;
+}
+
+/// Holds all of the index data structures for the column being modified.
+table BarrageModColumnMetadata {
+  /// This is an encoded and compressed Index of rows for this column (within the viewport) that were modified.
+  /// There is no notification for modifications outside of the viewport.
+  modified_rows: [byte];
 }
 
 /// A data header describing the shared memory layout of a "record" or "row"
 /// batch for a ticking barrage table.
-table BarrageRecordBatch {
+table BarrageUpdateMetadata {
+  /// The number of record batches that describe rows added (may be zero).
+  num_add_batches: ushort;
+
+  /// The number of record batches that describe rows modified (may be zero).
+  num_mod_batches: ushort;
 
   /// This batch is generated from an upstream table that ticks independently of the stream. If
   /// multiple events are coalesced into one update, the server may communicate that here for
   /// informational purposes.
-  firstSeq: long;
-  lastSeq: long;
+  first_seq: long;
+  last_seq: long;
 
-  /// indicates if this message was sent due to upstream ticks or due to a subscription change
-  isSnapshot: bool;
+  /// Indicates if this message was sent due to upstream ticks or due to a subscription change.
+  is_snapshot: bool;
 
   /// If this is a snapshot and the subscription is a viewport, then the effectively subscribed viewport
-  /// will be included in the payload. It is an encoded Index.
-  effectiveViewport: [byte];
+  /// will be included in the payload. It is an encoded and compressed Index.
+  effective_viewport: [byte];
 
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
-  effectiveColumnSet: [byte];
+  effective_column_set: [byte];
 
-  /// This is an encoded Index of rows that were added in this update.
-  addedRows: [byte];
+  /// This is an encoded and compressed Index of rows that were added in this update.
+  added_rows: [byte];
 
-  /// This is an encoded Index of rows that were removed in this update.
-  removedRows: [byte];
+  /// This is an encoded and compressed Index of rows that were removed in this update.
+  removed_rows: [byte];
 
-  /// This is an encoded IndexShiftData describing how the keyspace of unmodified rows changed.
-  shiftData: [byte];
+  /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
+  shift_data: [byte];
 
-  /// This is an encoded bitset of added columns that are included in this update; it will match the most
-  /// recently received effectiveColumnSet.
-  addedColumnSet: [byte];
-
-  /// This is an encoded bitset of modified columns that are included in this update. If this is a
-  /// snapshot, then this bitset will be empty.
-  modifiedColumnSet: [byte];
-
-  /// This is an encoded Index of rows that were included with this update
+  /// This is an encoded and compressed Index of rows that were included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
-  addedRowsIncluded: [byte];
+  added_rows_included: [byte];
 
-  /// The list of nodes are first any added columns (if addedRows is nonempty), followed by any modified
-  /// columns as indicated by modifiedColumnSet.
-  nodes: [BarrageFieldNode];
-
-  /// Buffers correspond to the pre-ordered flattened buffer tree
-  ///
-  /// The number of buffers appended to this list depends on the schema and which nodes were included in the update.
-  /// Refer to Arrow Flight's specification for buffer schema.
-  buffers: [org.apache.arrow.flatbuf.Buffer];
-
-  /// Optional compression of the message body
-  compression: org.apache.arrow.flatbuf.BodyCompression;
+  /// The list of modified column data are in the same order as the field nodes on the schema.
+  nodes: [BarrageModColumnMetadata];
 }
 ```

@@ -25,10 +25,7 @@ Motivation
 At Deephaven, we believe that iterative updating of intermediary datasets
 provides superior performance and lower latencies when compared to an
 otherwise identical periodically refreshing of that computation. We also
-believe that open standards help drive innovation in data science. Ideally
-our update model would more naturally fit into Flight's RPC paradigm. However,
-more efficient approaches can be taken by both the server and the client
-if take advantage of the flexibility of Flight.
+believe that open standards help drive innovation in data science.
 
 Problems we need to solve that are not already solved by Flight:
 - provide some way to identify which rows were removed or modified

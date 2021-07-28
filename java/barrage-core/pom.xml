@@ -19,7 +19,7 @@
   <parent>
     <groupId>io.deephaven.barrage</groupId>
     <artifactId>barrage-java-root</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -68,6 +68,10 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.arrow</groupId>
+        <artifactId>flight-core</artifactId>
     </dependency>
 
     <dependency>
@@ -165,17 +169,10 @@
             <configuration>
               <protoSourceRoot>${basedir}/../../format/</protoSourceRoot>
               <outputDirectory>${project.build.directory}/generated-sources/protobuf</outputDirectory>
-            </configuration>
-            <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>test</id>
-            <configuration>
-              <protoSourceRoot>${basedir}/src/test/protobuf</protoSourceRoot>
-              <outputDirectory>${project.build.directory}/generated-test-sources//protobuf</outputDirectory>
+              <includes>
+                  <!-- Note we only want to include the BrowserFlight service! -->
+                  <include>**/BrowserFlight.proto</include>
+              </includes>
             </configuration>
             <goals>
               <goal>compile</goal>
