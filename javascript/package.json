@@ -1,17 +1,14 @@
 {
   "name": "@deephaven/barrage",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Deephaven Barrage protocol",
   "main": "dist/barrage.js",
   "types": "dist/typings/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./dist ./generated",
     "build": "npm run clean && ./generateSchemas.sh && webpack",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run tsc",
     "tsc": "tsc --traceResolution -p tsconfig.json"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "author": "Deephaven Data Labs",
   "license": "Apache-2.0",
@@ -42,6 +39,7 @@
     "@types/google-protobuf": "^3.2.5",
     "@types/node": "^7.0.5",
     "google-protobuf": "^3.2.0",
+    "rimraf": "^3.0.2",
     "ts-loader": "^6.0.1",
     "typescript": "3.5.1",
     "webpack": "^5.45.0",
