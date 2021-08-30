@@ -59,9 +59,7 @@ namespace io.deephaven.barrage.flatbuf;
 
 enum BarrageMessageType : byte {
   /// A barrage message wrapper might send a None message type
-  /// if the msg_payload is empty. This is helpful for browser clients
-  /// that must send all client-streaming messages out-of-band
-  /// (note: browsers do not support client-streaming gRPCs)
+  /// if the msg_payload is empty.
   None = 0,
 
   /// for session management
@@ -88,17 +86,6 @@ table BarrageMessageWrapper {
 
   /// The msg payload.
   msg_payload: [byte];
-
-  /// Simulated Client Streaming Parameters (not required for regular client-only / bidirectional streams)
-
-  /// this ticket is used to find the stream in the session
-  rpc_ticket: [byte];
-
-  /// if messages are received out of sequence they get queued
-  sequence: long;
-
-  /// after processing this message tell the server to close the stream and to release the rpc_ticket
-  half_close_after_message: boolean;
 }
 
 /// Establish a new session.
