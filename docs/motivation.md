@@ -1,6 +1,5 @@
 ---
 title: Motivation
-nav_order: 2
 ---
 
 <!---
@@ -19,15 +18,13 @@ nav_order: 2
   limitations under the License.
 -->
 
-Motivation
-==========
-
 At Deephaven, we believe that iterative updating of intermediary datasets
 provides superior performance and lower latencies when compared to an
 otherwise identical periodically refreshing of that computation. We also
 believe that open standards help drive innovation in data science.
 
 Problems we need to solve that are not already solved by Flight:
+
 - provide some way to identify which rows were removed or modified
 - provide cross section of columns and rows that were modified in addition to data in added rows
 

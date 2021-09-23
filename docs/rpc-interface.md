@@ -1,6 +1,5 @@
 ---
 title: RPC Interface
-nav_order: 4
 ---
 
 <!---
@@ -19,9 +18,6 @@ nav_order: 4
   limitations under the License.
 -->
 
-RPC Interface
-=============
-
 Barrage is an RPC interface for high-performance data services based on Arrow,
 for ticking data sets built on top of gRPC.
 
@@ -36,11 +32,11 @@ The main subscription mechanism is initiated via a `DoExchange`. The client
 sends a SubscriptionRequest (or as many as they like) and the server sends
 barrage updates to satisfy their subscription's requirements.
 
+## Flat Buffer Definitions
 
-Flat Buffer Definitions
------------------------
+<!-- fbs, not ts, but we don't have a syntax highlighter for that -->
 
-```fbs
+```ts
 // Copyright 2020 Deephaven Data Labs
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
