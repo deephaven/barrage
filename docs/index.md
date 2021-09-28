@@ -1,6 +1,6 @@
 ---
 title: Barrage
-nav_order: 1
+slug: /docs
 ---
 
 <!---
@@ -19,11 +19,15 @@ nav_order: 1
   limitations under the License.
 -->
 
-Barrage
-=======
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { vsGithubInverted } from '@deephaven/icons';
+
+<div className="comment-title">
 
 Barrage is an extension of Apache Arrow Flight, with a particular focus on
 intermediary data sets that change over time.
+
+</div>
 
 We at Deephaven believe that it is Arrow's and similar projects' drive
 for efficient standards that enables a lot of the innovation we see in
@@ -32,9 +36,11 @@ data science.
 The way we see data at Deephaven doesn't quite fit into the model that
 Arrow Flight proposes; our tables change over time. We believe that live
 use cases are better served, both in latency and in throughput, by an iterative
-update model rather than a periodic refresh. See [Motivation](Motivation.md)
+update model rather than a periodic refresh. See [motivation](motivation.md)
 for more information.
 
 Barrage introduces a new ArrowMessage header type, the `BarrageRecordBatch`.
 This header contains all of the information needed to apply the update model. See
-[Concepts](Concepts.md) for more information on the update model.
+[concepts](./concepts.md) for more information on the update model.
+
+<a className="button button--success" href="https://github.com/deephaven/barrage"><FontAwesomeIcon icon={vsGithubInverted} /> Barrage Github Repo</a>

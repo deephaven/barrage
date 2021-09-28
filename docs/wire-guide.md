@@ -1,6 +1,5 @@
 ---
 title: Wire Guide
-nav_order: 5
 ---
 
 <!---
@@ -19,21 +18,18 @@ nav_order: 5
   limitations under the License.
 -->
 
-Wire Guide
-==========
-
 Inside of a BarrageRecordBatch there are three different wire types that you
 will need to become familiar with. Additionally, setting a viewport requires
 that you communicate which position-space you want to receive updates to.
 
-Index Wire Format
------------------
+## Index Wire Format
 
 An Index is serialized as a series of commands. Each command is one-byte
 split into a 5-bit (high) value and a 3-bit (low) value.
 
 Possible Command Types (most significant 5 bits):
-```
+
+```java
 OFFSET      = 1;
 SHORT_ARRAY = 2;
 BYTE_ARRAY  = 3;
@@ -41,7 +37,8 @@ END         = 4;
 ```
 
 Possible Value Types (low 3 bits):
-```
+
+```java
 SHORT_VALUE = 1; // 2 bytes
 INT_VALUE   = 2; // 4 bytes
 LONG_VALUE  = 3; // 8 bytes
@@ -62,7 +59,8 @@ uses the sign to encode a single value (a positive value) vs a rangle
 (a positive value followed by a negative value).
 
 To reconstruct the Index run the parsed values through this pseudo code:
-```
+
+```java
 long pending = -1;
 long lastValue = 0;
 void consume(long nextOffset) {
@@ -80,8 +78,7 @@ void consume(long nextOffset) {
 }
 ```
 
-IndexShiftData Wire Format
---------------------------
+## IndexShiftData Wire Format
 
 Hopefully you were able to follow the previous section. `IndexShiftData`'s
 binary encoding is three `Index` encodings without any padding in-between.
@@ -93,9 +90,7 @@ moved to `[d_i, d_i + e_i - s_i]`. Note that not all rows are required to exist
 within the shift; it is highly recommended to intersect each shift with the
 state that you have on hand to avoid iterating through the entire range.
 
-BitSet Wire Format
-------------------
+## BitSet Wire Format
 
 The bitset is represented in little-endian byte-ordered bits. Assume
 that all omitted bits are zero.
-

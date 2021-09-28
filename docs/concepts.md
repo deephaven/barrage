@@ -1,6 +1,5 @@
 ---
 title: Concepts
-nav_order: 3
 ---
 
 <!---
@@ -19,11 +18,7 @@ nav_order: 3
   limitations under the License.
 -->
 
-Concepts
-========
-
-Key Space
----------
+## Key Space
 
 To effectively communicate changes to rows of a table, we need a way to
 identify them. Our operations
@@ -33,8 +28,7 @@ output ordering. Keyspace can be thought of as a set of ordered longs
 added, removed, or even shifted within the keyspace. See the "Update Model"
 section below for more information on how a keyspace may change over time.
 
-Position Space
---------------
+## Position Space
 
 If a table has `n` rows then it has a position space of `[0, n)`. This is
 an alternative naming for the rows in the table. However, which row is the
@@ -47,8 +41,7 @@ by the set of rows with keys `[0, 9], [100, 109], and [310, 319]`. This is
 still identified in position space as `[0, 29]`, however the 30th position-space
 element now refers to key `319` instead of key `189`.
 
-Viewport
---------
+## Viewport
 
 Depending on the final destination and use of the data, the developer may
 not necessarily want to have all of the data at once. If, for example, the
@@ -56,22 +49,22 @@ data is destined for a human-facing widget then you may only need a slice
 of the data. We call these slices viewports.
 
 Viewports are in position space because:
+
 - they are difficult to synchronize with the server as the keyspace may vary tick to tick.
 - the api more closely resembles a pagination over `n` records.
 
-Index
------
+## Index
 
 An Index is an ordered set of rows and may represent either the table's key-space
 or the table's position-space.
 
 Indexes have a variety of uses. They:
+
 - describe which rows exist in a table (key-space)
 - describe which rows were added/removed/modified in a table (key-space)
 - describe a viewport (position-space)
 
-IndexShiftData
---------------
+## IndexShiftData
 
 Some operations need to be able to rearrange the keyspace to accommodate
 changes in data. For example, a sort may need to move rows that are adjacent in
@@ -81,17 +74,17 @@ changes independently from additions, removals, and modifications.
 
 We call a single transformation a `shift`. A shift is defined by a `start`, `end`,
 and `delta`. All rows in the range `[start, end]` (inclusive) change in key-space by
-`delta` and are now located  at `[start + delta, end + delta]`.
+`delta` and are now located at `[start + delta, end + delta]`.
 
 Things get pretty tricky quickly. For practical reasons, there are a few restrictions:
+
 - shift origins are not allowed to overlap in pre-shift keyspace
 - shift destinations are not allowed to overlap in post-shift keyspace
 - shifts are unable to alter the ordering of rows in position space
 - positive deltas must be applied in high-to-low keyspace order
 - negative deltas must be applied in low-to-high keyspace order
 
-Update Model
-------------
+## Update Model
 
 In pseudo-code, an update (roughly) looks like:
 
@@ -105,18 +98,20 @@ class Update {
 ```
 
 To properly apply an update you must take care to apply it in order:
+
 1. remove data for all rows that were removed on this update
 2. apply the index shift data to your current state; your state is now in post-shift keyspace
-  - note: often, positive deltas must be applied in highest to lowest order to avoid losing state
-  - note: often, negative deltas must be applied in lowest to highest order to avoid losing state
+
+- note: often, positive deltas must be applied in highest to lowest order to avoid losing state
+- note: often, negative deltas must be applied in lowest to highest order to avoid losing state
+
 3. add data for all rows that were added on this update
 4. apply any modification that affects your state
 
 Modified columns are independent of each other and may
 have different sets of modified rows.
 
-Snapshot
---------
+## Snapshot
 
 New subscriptions, and subscription changes, warrant a refresh of data that
 is in the view of their subscription. If the subscription is made without
@@ -126,19 +121,20 @@ is required to be responded to. Instead, the message will be marked as being
 a snapshot.
 
 Snapshots:
+
 - do not remove rows
 - do not modify rows
 - do not shift rows
 - the server may omit data the client has from an existing subscription
 - include the acknowledged viewport and subscribed column set
 
-Scoped Rows
------------
+## Scoped Rows
 
 Since viewports are in position-space, we need to be able to communicate data that
 shifts into view but is otherwise not new.
 
 Imagine the scenario:
+
 1. Let `T` be our imaginary table.
 2. Let `C` be a viewport client of `T` subscribed to position space `[100, 199]`.
 3. `T` ticks and removes rows in position space `[0, 19]`.
@@ -146,4 +142,4 @@ Imagine the scenario:
 
 We call these rows `scoped` rows. They are integrated with `added` rows in an update,
 but are distinguishable via the `addedRowsIncluded` field included in the `BarrageRecordBatch`.
-See the [Wire Guide](WireGuide.md) for more details.
+See the [Wire Guide](wire-guide.md) for more details.
