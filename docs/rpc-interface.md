@@ -125,10 +125,9 @@ table BarrageSubscriptionOptions {
 
   /// Explicitly set the update interval for this subscription. Note that subscriptions with different update intervals
   /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
-  /// Setting this field does not guarantee updates will be received at this frequency.
   ///
   /// Note: if not supplied (default of zero) then the server uses a consistent value to be efficient and fair to all clients
-  update_interval_ms: int;
+  min_update_interval_ms: int;
 
   /// Specify a preferred batch size.
   batch_size: int;
