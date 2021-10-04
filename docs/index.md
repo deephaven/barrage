@@ -33,8 +33,7 @@ for efficient standards that enables a lot of the innovation we see in
 data science.
 
 We want to share the way we see data at Deephaven.  We believe that live use cases are better served, both in 
-latency and in throughput, by an iterative update model rather than a periodic refresh. See [motivation](motivation.md)
-for more information.
+latency and in throughput, by an iterative update model rather than a periodic refresh.
 
 Barrage introduces flatbuffer metadata types that are sent to/from a Barrage server via FlightData's metadata. The 
 `BarrageMessageWrapper` is the expected outer type, but is intended to be a cheap model that is sensitive to custom

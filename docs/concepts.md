@@ -120,8 +120,8 @@ To properly apply an update you must take care to apply it in order:
 4. apply any modification that affects your state
 
 Modified columns are independent of each other and may
-have different sets of modified rows. This is caused by coalescing that must occur when the LTM clock cycle
-is shorter than the Barrage update interval.
+have different sets of modified rows. This is caused by coalescing that must occur when the engine 
+updates more frequently than the subscription allows.
 
 ## Snapshot
 
