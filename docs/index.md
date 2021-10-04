@@ -24,8 +24,7 @@ import { vsGithubInverted } from '@deephaven/icons';
 
 <div className="comment-title">
 
-Barrage is an extension of Apache Arrow Flight, with a particular focus on
-intermediary data sets that change over time.
+Barrage is an extension of Apache Arrow Flight, with a particular focus on incrementally updating data sets.
 
 </div>
 
@@ -33,14 +32,13 @@ We at Deephaven believe that it is Arrow's and similar projects' drive
 for efficient standards that enables a lot of the innovation we see in
 data science.
 
-The way we see data at Deephaven doesn't quite fit into the model that
-Arrow Flight proposes; our tables change over time. We believe that live
-use cases are better served, both in latency and in throughput, by an iterative
-update model rather than a periodic refresh. See [motivation](motivation.md)
+We want to share the way we see data at Deephaven.  We believe that live use cases are better served, both in 
+latency and in throughput, by an iterative update model rather than a periodic refresh. See [motivation](motivation.md)
 for more information.
 
-Barrage introduces a new ArrowMessage header type, the `BarrageRecordBatch`.
-This header contains all of the information needed to apply the update model. See
-[concepts](./concepts.md) for more information on the update model.
+Barrage introduces flatbuffer metadata types that are sent to/from a Barrage server via FlightData's metadata. The 
+`BarrageMessageWrapper` is the expected outer type, but is intended to be a cheap model that is sensitive to custom
+user needs. The `BarrageUpdateMetadata` is the inner-type that contains the information
+needed to apply the update model. See [concepts](./concepts.md) for more information on the update model.
 
 <a className="button button--success" href="https://github.com/deephaven/barrage"><FontAwesomeIcon icon={vsGithubInverted} /> Barrage Github Repo</a>

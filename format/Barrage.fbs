@@ -19,15 +19,16 @@ enum BarrageMessageType : byte {
   /// if the msg_payload is empty.
   None = 0,
 
-  /// for session management
+  /// for session management (not-yet-used)
   NewSessionRequest = 1,
   RefreshSessionRequest = 2,
   SessionInfoResponse = 3,
 
-  /// for subscription parsing/management (aka DoGet, DoPush, DoExchange)
+  /// for subscription parsing/management (aka DoPut, DoExchange)
   BarrageSerializationOptions = 4,
   BarrageSubscriptionRequest = 5,
   BarrageUpdateMetadata = 6,
+  DoGetRequest = 7,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -78,13 +79,23 @@ table SessionInfoResponse {
 ///   ThrowError          - Refuse to send the column and throw an internal error sharing as much detail as possible
 enum ColumnConversionMode : byte { Stringify = 1, JavaSerialization, ThrowError }
 
-table BarrageSerializationOptions {
+table BarrageSubscriptionOptions {
   /// see enum for details
   column_conversion_mode: ColumnConversionMode = Stringify;
 
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
   use_deephaven_nulls: bool;
+
+  /// Explicitly set the update interval for this subscription. Note that subscriptions with different update intervals
+  /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
+  /// Setting this field does not guarantee updates will be received at this frequency.
+  ///
+  /// Note: if not supplied (default of zero) then the server uses a consistent value to be efficient and fair to all clients
+  update_interval_ms: int;
+
+  /// Specify a preferred batch size.
+  batch_size: int;
 }
 
 /// Describes the subscription the client would like to acquire.
@@ -98,15 +109,23 @@ table BarrageSubscriptionRequest {
   /// This is an encoded and compressed Index of rows in position-space to subscribe to.
   viewport: [byte];
 
-  /// Explicitly set the update interval for this subscription. Note that subscriptions with different update intervals
-  /// cannot share intermediary state with other subscriptions and greatly increases the footprint of the non-conforming subscription.
-  /// Setting this field does not guarantee updates will be received at this frequency.
-  ///
-  /// Note: if not supplied (default of zero) then the server uses a consistent value to be efficient and fair to all clients
-  update_interval_ms: long;
+  /// Optionally enable/disable special serialization features.
+  subscription_options: BarrageSubscriptionOptions;
+}
+
+/// Describes the DoGet the client would like to acquire.
+table DoGetRequest {
+  /// Ticket for the source data set.
+  ticket: [byte];
+
+  /// The bitset of columns to subscribe to. An empty bitset unsubscribes from all columns.
+  columns: [byte];
+
+  /// This is an encoded and compressed Index of rows in position-space to subscribe to.
+  viewport: [byte];
 
   /// Optionally enable/disable special serialization features.
-  serialization_options: BarrageSerializationOptions;
+  subscription_options: BarrageSubscriptionOptions;
 }
 
 /// Holds all of the index data structures for the column being modified.
@@ -156,5 +175,5 @@ table BarrageUpdateMetadata {
   added_rows_included: [byte];
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
-  nodes: [BarrageModColumnMetadata];
+  modified: [BarrageModColumnMetadata];
 }
