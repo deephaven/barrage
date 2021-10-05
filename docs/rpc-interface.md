@@ -18,16 +18,13 @@ title: RPC Interface
   limitations under the License.
 -->
 
-The Barrage extension works by sending
-additional metadata via the `app_metadata` field on `FlightData`. This metadata
-is used to communicate the necessary additional information between server
-and client. These types are flatbuffers, so that we may more easily lift the
-`app_metadata` into the `RecordBatch` flatbuffer once Arrow supports byte-array
+The Barrage extension works by sending additional metadata via the `app_metadata` field on `FlightData`. This metadata
+is used to communicate the necessary additional information between server and client. These types are flatbuffers, so 
+that we may more easily lift the `app_metadata` into the `RecordBatch` flatbuffer once Arrow supports byte-array
 metadata, at that layer.
 
-The main subscription mechanism is initiated via a `DoExchange`. The client
-sends a SubscriptionRequest (or as many as they like) and the server sends
-barrage updates to satisfy their subscription's requirements.
+The main subscription mechanism is initiated via a `DoExchange`. The client sends a SubscriptionRequest (or as many as 
+they like) and the server sends barrage updates to satisfy their subscription's requirements.
 
 ## Flat Buffer Definitions
 
@@ -129,7 +126,9 @@ table BarrageSubscriptionOptions {
   /// Note: if not supplied (default of zero) then the server uses a consistent value to be efficient and fair to all clients
   min_update_interval_ms: int;
 
-  /// Specify a preferred batch size.
+  /// Specify a preferred batch size. Server is allowed to be configured to restrict possible values. Too small of a
+  /// batch size may be dominated with header costs as each batch is wrapped into a separate RecordBatch. Too large of
+  /// a payload and it may not fit within the maximum payload size. A good default might be 4096.
   batch_size: int;
 }
 
@@ -138,13 +137,13 @@ table BarrageSubscriptionRequest {
   /// Ticket for the source data set.
   ticket: [byte];
 
-  /// The bitset of columns to subscribe to. An empty bitset unsubscribes from all columns.
+  /// The bitset of columns to subscribe. If not provided then all columns are subscribed.
   columns: [byte];
 
   /// This is an encoded and compressed Index of rows in position-space to subscribe to.
   viewport: [byte];
 
-  /// Optionally enable/disable special serialization features.
+  /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
 }
 
@@ -153,13 +152,14 @@ table DoGetRequest {
   /// Ticket for the source data set.
   ticket: [byte];
 
-  /// The bitset of columns to subscribe to. An empty bitset unsubscribes from all columns.
+  /// The bitset of columns to request. If not provided then all columns are requested.
   columns: [byte];
 
-  /// This is an encoded and compressed Index of rows in position-space to subscribe to.
+  /// This is an encoded and compressed Index of rows in position-space to subscribe to. If not provided then the entire
+  /// table is requested.
   viewport: [byte];
 
-  /// Optionally enable/disable special serialization features.
+  /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
 }
 
@@ -210,6 +210,6 @@ table BarrageUpdateMetadata {
   added_rows_included: [byte];
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
-  modified: [BarrageModColumnMetadata];
+  mod_column_nodes: [BarrageModColumnMetadata];
 }
 ```

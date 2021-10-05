@@ -28,9 +28,8 @@ Barrage is an extension of Apache Arrow Flight, with a particular focus on incre
 
 </div>
 
-We at Deephaven believe that it is Arrow's and similar projects' drive
-for efficient standards that enables a lot of the innovation we see in
-data science.
+We at Deephaven believe that it is Arrow's and similar projects' drive  for efficient standards that enables a lot of 
+the innovation we see in data science.
 
 We want to share the way we see data at Deephaven.  We believe that live use cases are better served, both in 
 latency and in throughput, by an iterative update model rather than a periodic refresh.
