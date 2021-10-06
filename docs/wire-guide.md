@@ -18,11 +18,10 @@ title: Wire Guide
   limitations under the License.
 -->
 
-Inside of a BarrageRecordBatch there are three different wire types that you
-will need to become familiar with. Additionally, setting a viewport requires
-that you communicate which position-space you want to receive updates to.
+There are three different wire types that you will need to become familiar with to parse and process a 
+`BarrageUpdateMetadata`. You will also need to know how to write your own  Row Set / Index to set a viewport.
 
-## Index Wire Format
+## Row Set / Index Wire Format
 
 An Index is serialized as a series of commands. Each command is one-byte
 split into a 5-bit (high) value and a 3-bit (low) value.
@@ -86,9 +85,15 @@ binary encoding is three `Index` encodings without any padding in-between.
 The three Indexes are `starts`, `ends` and `dests`. Each Index will have the
 same length. Let `s_i = starts[i]`, `e_i = ends[i]`, `d_i = dests[i]`, then this
 triplet represents the notification that all data in keyspace `[s_i, e_i]` (inclusive)
-moved to `[d_i, d_i + e_i - s_i]`. Note that not all rows are required to exist
-within the shift; it is highly recommended to intersect each shift with the
-state that you have on hand to avoid iterating through the entire range.
+moved to `[d_i, d_i + e_i - s_i]`. 
+
+:::Note 
+
+Note that not all rows are required to exist within the shift; it is recommended to avoid iterating through 
+the entire range. See [IndexShiftData](https://github.com/deephaven/deephaven-core/blob/main/DB/src/main/java/io/deephaven/db/v2/utils/IndexShiftData.java)
+for insipration.
+
+:::
 
 ## BitSet Wire Format
 

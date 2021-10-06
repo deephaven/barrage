@@ -18,21 +18,41 @@ title: Concepts
   limitations under the License.
 -->
 
-## Key Space
+The documentation on [Deephaven's table update model](https://deephaven.io/core/docs/conceptual/table-update-model/)
+is highly recommended supplement material.
 
-To effectively communicate changes to rows of a table, we need a way to
-identify them. Our operations
-often are dependent on ordering of the parent table and/or produce a well-defined
-output ordering. Keyspace can be thought of as a set of ordered longs
-(non-negative and no larger than `2^63-1`). As the table ticks, rows are
-added, removed, or even shifted within the keyspace. See the "Update Model"
-section below for more information on how a keyspace may change over time.
+## Row Set
 
-## Position Space
+Many of the messages that are sent by Barrage identify the set of rows that this update affects. These are ordered 
+sets of rows in row key space. Sometimes we refer to these as an Index.
 
-If a table has `n` rows then it has a position space of `[0, n)`. This is
-an alternative naming for the rows in the table. However, which row is the
-`i`th row depends on the context and current state of the table.
+To discuss sets of rows we need to be aware that each row of data has two identifiers. 
+ - Row Position Id
+ - Row Key Id
+
+A RowSet is an ordered set of rows and may represent either the table's key-space
+or the table's position-space. Sometimes we refer to a row set as an Index.
+
+Indexes have a variety of uses. They:
+
+- describe which rows exist in a table (key-space)
+- describe which rows were added/removed/modified in a table (key-space)
+- describe a viewport (position-space)
+- 
+### Row Positions
+
+If a table has `n` rows then it has a position space of `[0, n-1]`. It is simply the ordering of rows if they were to
+be stored right next to each other in memory. Most user provided Row Sets are, for the convenience of the user,
+in row position space.
+
+### Row Keys
+
+The reality is that it's not efficient to store all of your records smushed together in a tight key space. For example,
+you cannot perform iterative sort in faster than `O(n * k)` if you have `n` records and `k` adds/mods/removes. However,
+if the protocol allows for spreading rows out then you can amortize a lot of this cost away. Many of our operations
+think of rows in the context of their row key identifier.
+
+:::note
 
 For example, let table T be defined by the set of rows with keys
 `[0, 9], [100, 109], and [180, 189]`. In position space you can identify this
@@ -41,28 +61,19 @@ by the set of rows with keys `[0, 9], [100, 109], and [310, 319]`. This is
 still identified in position space as `[0, 29]`, however the 30th position-space
 element now refers to key `319` instead of key `189`.
 
+:::
+
 ## Viewport
 
 Depending on the final destination and use of the data, the developer may
-not necessarily want to have all of the data at once. If, for example, the
+not necessarily want to subscribe to the entire dataset at once. If, for example, the
 data is destined for a human-facing widget then you may only need a slice
 of the data. We call these slices viewports.
 
 Viewports are in position space because:
 
-- they are difficult to synchronize with the server as the keyspace may vary tick to tick.
+- they are difficult to synchronize with the server as the row key space may vary tick to tick.
 - the api more closely resembles a pagination over `n` records.
-
-## Index
-
-An Index is an ordered set of rows and may represent either the table's key-space
-or the table's position-space.
-
-Indexes have a variety of uses. They:
-
-- describe which rows exist in a table (key-space)
-- describe which rows were added/removed/modified in a table (key-space)
-- describe a viewport (position-space)
 
 ## IndexShiftData
 
@@ -88,7 +99,7 @@ Things get pretty tricky quickly. For practical reasons, there are a few restric
 
 In pseudo-code, an update (roughly) looks like:
 
-```
+```java
 class Update {
   Index added;  // post shift key-space
   Index removed; // pre shift key-space
@@ -102,14 +113,15 @@ To properly apply an update you must take care to apply it in order:
 1. remove data for all rows that were removed on this update
 2. apply the index shift data to your current state; your state is now in post-shift keyspace
 
-- note: often, positive deltas must be applied in highest to lowest order to avoid losing state
-- note: often, negative deltas must be applied in lowest to highest order to avoid losing state
+- note: positive deltas should be applied in highest to lowest order to avoid losing state
+- note: negative deltas should be applied in lowest to highest order to avoid losing state
 
 3. add data for all rows that were added on this update
 4. apply any modification that affects your state
 
 Modified columns are independent of each other and may
-have different sets of modified rows.
+have different sets of modified rows. This is caused by coalescing that must occur when the engine 
+updates more frequently than the subscription allows.
 
 ## Snapshot
 
