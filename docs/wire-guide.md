@@ -87,7 +87,7 @@ same length. Let `s_i = starts[i]`, `e_i = ends[i]`, `d_i = dests[i]`, then this
 triplet represents the notification that all data in keyspace `[s_i, e_i]` (inclusive)
 moved to `[d_i, d_i + e_i - s_i]`. 
 
-:::Note 
+:::note 
 
 Note that not all rows are required to exist within the shift; it is recommended to avoid iterating through 
 the entire range. See [IndexShiftData](https://github.com/deephaven/deephaven-core/blob/main/DB/src/main/java/io/deephaven/db/v2/utils/IndexShiftData.java)
