@@ -69,7 +69,7 @@ enum BarrageMessageType : byte {
 /// The message wrapper used for all barrage app_metadata fields.
 table BarrageMessageWrapper {
   /// Used to identify this type of app_metadata vs other applications.
-  /// The magic value is '0x6E687064'. It is the numerical representation of the ASCII "dhvn".
+  /// The magic value is '0x6E687064'. It is the numerical representation of the ASCII "dphn".
   magic: uint;
 
   /// The msg type being sent.
