@@ -6,4 +6,4 @@ ticking data sets.
 In this project contains a few methods to augment to Apache Arrow Flight to support
 out-of-band client-streams for javascript clients.
 
-See documentation here: https://deephaven.github.io/barrage/ (And soon at https://deephaven.io/barrage/docs/)
+See documentation here: https://deephaven.io/barrage/docs/
