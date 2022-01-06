@@ -23,7 +23,7 @@ There are three different wire types that you will need to become familiar with 
 
 ## Row Set / Index Wire Format
 
-An Index is serialized as a series of commands. Each command is one-byte
+A Row Set is serialized as a series of commands. Each command is one-byte
 split into a 5-bit (high) value and a 3-bit (low) value.
 
 Possible Command Types (most significant 5 bits):
@@ -52,12 +52,12 @@ shorts or bytes depending on the command type. The offset command is a single
 value (then followed by the next command).
 
 The series of values parsed from the previous paragraph can be used to
-reconstruct an Index. Since an Index is an ordered set, all of the values that
+reconstruct a Row Set. Since a Row Set is an ordered set, all of the values that
 we insert, should always be increasing and thus positive. The algorithm then
 uses the sign to encode a single value (a positive value) vs a rangle
 (a positive value followed by a negative value).
 
-To reconstruct the Index run the parsed values through this pseudo code:
+To reconstruct the Row Set run the parsed values through this pseudo code:
 
 ```java
 long pending = -1;
@@ -80,9 +80,9 @@ void consume(long nextOffset) {
 ## IndexShiftData Wire Format
 
 Hopefully you were able to follow the previous section. `IndexShiftData`'s
-binary encoding is three `Index` encodings without any padding in-between.
+binary encoding is three `Row Set` encodings without any padding in-between.
 
-The three Indexes are `starts`, `ends` and `dests`. Each Index will have the
+The three Row Sets are `starts`, `ends` and `dests`. Each Row Set will have the
 same length. Let `s_i = starts[i]`, `e_i = ends[i]`, `d_i = dests[i]`, then this
 triplet represents the notification that all data in keyspace `[s_i, e_i]` (inclusive)
 moved to `[d_i, d_i + e_i - s_i]`. 
