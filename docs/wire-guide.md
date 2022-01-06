@@ -21,10 +21,16 @@ title: Wire Guide
 There are three different wire types that you will need to become familiar with to parse and process a 
 `BarrageUpdateMetadata`. You will also need to know how to write your own  Row Set / Index to set a viewport.
 
-## Row Set / Index Wire Format
+## Row Set Wire Format
 
 A Row Set is serialized as a series of commands. Each command is one-byte
 split into a 5-bit (high) value and a 3-bit (low) value.
+
+:::note
+
+[Deephaven Enterprise](https://deephaven.io/enterprise/) uses the term `Index` instead of `Row Set` to refer to this concept.
+
+:::
 
 Possible Command Types (most significant 5 bits):
 
