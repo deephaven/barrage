@@ -19,7 +19,7 @@ title: Wire Guide
 -->
 
 There are three different wire types that you will need to become familiar with to parse and process a 
-`BarrageUpdateMetadata`. You will also need to know how to write your own  Row Set / Index to set a viewport.
+`BarrageUpdateMetadata`. You will also need to know how to write your own  Row Set to set a viewport.
 
 ## Row Set Wire Format
 
@@ -59,7 +59,7 @@ value (then followed by the next command).
 
 The series of values parsed from the previous paragraph can be used to
 reconstruct a Row Set. Since a Row Set is an ordered set, all of the values that
-we insert, should always be increasing and thus positive. The algorithm then
+we insert should always be increasing and thus positive. The algorithm then
 uses the sign to encode a single value (a positive value) vs a rangle
 (a positive value followed by a negative value).
 
@@ -83,10 +83,10 @@ void consume(long nextOffset) {
 }
 ```
 
-## IndexShiftData Wire Format
+## RowSetShiftData Wire Format
 
-Hopefully you were able to follow the previous section. `IndexShiftData`'s
-binary encoding is three `Row Set` encodings without any padding in-between.
+To implement [row shifts](https://deephaven.io/core/docs/conceptual/table-update-model/#shifts), 
+`RowSetShiftData` is a binary encoding of three `Row Set` encodings without any padding in-between.
 
 The three Row Sets are `starts`, `ends` and `dests`. Each Row Set will have the
 same length. Let `s_i = starts[i]`, `e_i = ends[i]`, `d_i = dests[i]`, then this
@@ -96,8 +96,8 @@ moved to `[d_i, d_i + e_i - s_i]`.
 :::note 
 
 Note that not all rows are required to exist within the shift; it is recommended to avoid iterating through 
-the entire range. See [IndexShiftData](https://github.com/deephaven/deephaven-core/blob/main/DB/src/main/java/io/deephaven/db/v2/utils/IndexShiftData.java)
-for insipration.
+the entire range. See [RowSetShiftData](https://github.com/deephaven/deephaven-core/blob/main/engine/rowset/src/main/java/io/deephaven/engine/rowset/RowSetShiftData.java)
+for inspiration.
 
 :::
 
