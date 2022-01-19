@@ -62,6 +62,7 @@ enum BarrageMessageType : byte {
   BarrageSubscriptionRequest = 5,
   BarrageUpdateMetadata = 6,
   BarrageSnapshotRequest = 7,
+  DoPushRequest = 8,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -143,6 +144,12 @@ table BarrageSubscriptionRequest {
   /// This is an encoded and compressed Index of rows in position-space to subscribe to.
   viewport: [byte];
 
+  /// This is an encoded and compressed Index of rows in tail-position-space to subscribe to. For example consider the
+  /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every index is converted from `i` to `n - i`
+  /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
+  /// experience for subscriptions that want to track the tail of a ticking table.
+  tail_viewport: [byte];
+
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
 }
@@ -175,6 +182,17 @@ table BarrageSnapshotRequest {
 
   /// Options to configure your subscription.
   snapshot_options: BarrageSnapshotOptions;
+}
+
+/// Describes the table update stream the client would like to push to. This is similar to a DoPut but the client
+/// will send BarrageUpdateMetadata to explicitly describe the row key space. The updates sent adhere to the table
+/// update model semantics; thus DoPush enables the client to upload a ticking table.
+table DoPushRequest {
+  /// The destination Ticket.
+  ticket: [byte];
+
+  /// Options to configure your request.
+  subscription_options: BarrageSubscriptionOptions;
 }
 
 /// Holds all of the index data structures for the column being modified.
