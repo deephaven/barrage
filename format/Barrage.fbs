@@ -99,6 +99,22 @@ table BarrageSubscriptionOptions {
   batch_size: int;
 }
 
+/// This is an encoded and compressed Index
+table EncodedIndex {
+  /// Proposal/optional. We might want a field here if we ever want to toy with the index
+  /// serialization format and support multiple versions.
+  version: byte;
+
+  /// Encoded and compressed index data.
+  data: [byte];
+}
+
+table IndexShiftData {
+  starts: EncodedIndex;
+  ends: EncodedIndex;
+  deltas: EncodedIndex;
+}
+
 /// Describes the subscription the client would like to acquire.
 table BarrageSubscriptionRequest {
   /// Ticket for the source data set.
@@ -108,7 +124,7 @@ table BarrageSubscriptionRequest {
   columns: [byte];
 
   /// This is an encoded and compressed Index of rows in position-space to subscribe to.
-  viewport: [byte];
+  viewport: EncodedIndex;
 
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
@@ -124,7 +140,7 @@ table DoGetRequest {
 
   /// This is an encoded and compressed Index of rows in position-space to subscribe to. If not provided then the entire
   /// table is requested.
-  viewport: [byte];
+  viewport: EncodedIndex;
 
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
@@ -134,7 +150,7 @@ table DoGetRequest {
 table BarrageModColumnMetadata {
   /// This is an encoded and compressed Index of rows for this column (within the viewport) that were modified.
   /// There is no notification for modifications outside of the viewport.
-  modified_rows: [byte];
+  modified_rows: EncodedIndex;
 }
 
 /// A data header describing the shared memory layout of a "record" or "row"
@@ -163,18 +179,18 @@ table BarrageUpdateMetadata {
   effective_column_set: [byte];
 
   /// This is an encoded and compressed Index of rows that were added in this update.
-  added_rows: [byte];
+  added_rows: EncodedIndex;
 
   /// This is an encoded and compressed Index of rows that were removed in this update.
-  removed_rows: [byte];
+  removed_rows: EncodedIndex;
 
   /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
-  shift_data: [byte];
+  shift_data: IndexShiftData;
 
   /// This is an encoded and compressed Index of rows that were included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
-  added_rows_included: [byte];
+  added_rows_included: EncodedIndex;
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
   mod_column_nodes: [BarrageModColumnMetadata];
