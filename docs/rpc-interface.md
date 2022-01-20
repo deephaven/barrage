@@ -141,17 +141,17 @@ table BarrageSubscriptionRequest {
   /// The bitset of columns to subscribe. If not provided then all columns are subscribed.
   columns: [byte];
 
-  /// This is an encoded and compressed Index of rows in position-space to subscribe to.
+  /// This is an encoded and compressed RowSet in position-space to subscribe to.
   viewport: [byte];
-
-  /// This is an encoded and compressed Index of rows in tail-position-space to subscribe to. For example consider the
-  /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every index is converted from `i` to `n - i`
-  /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
-  /// experience for subscriptions that want to track the tail of a ticking table.
-  tail_viewport: [byte];
 
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
+
+  /// This is an encoded and compressed RowSet in tail-position-space to subscribe to. For example consider the
+  /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every RowSet is converted from `i` to `n - i`
+  /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
+  /// experience for subscriptions that want to track the tail of a ticking table.
+  tail_viewport: [byte];
 }
 
 table BarrageSnapshotOptions {
@@ -176,7 +176,7 @@ table BarrageSnapshotRequest {
   /// The bitset of columns to request. If not provided then all columns are requested.
   columns: [byte];
 
-  /// This is an encoded and compressed Index of rows in position-space to subscribe to. If not provided then the entire
+  /// This is an encoded and compressed RowSet in position-space to subscribe to. If not provided then the entire
   /// table is requested.
   viewport: [byte];
 
@@ -195,9 +195,9 @@ table DoPushRequest {
   subscription_options: BarrageSubscriptionOptions;
 }
 
-/// Holds all of the index data structures for the column being modified.
+/// Holds all of the RowSet data structures for the column being modified.
 table BarrageModColumnMetadata {
-  /// This is an encoded and compressed Index of rows for this column (within the viewport) that were modified.
+  /// This is an encoded and compressed RowSed for this column (within the viewport) that were modified.
   /// There is no notification for modifications outside of the viewport.
   modified_rows: [byte];
 }
@@ -221,22 +221,22 @@ table BarrageUpdateMetadata {
   is_snapshot: bool;
 
   /// If this is a snapshot and the subscription is a viewport, then the effectively subscribed viewport
-  /// will be included in the payload. It is an encoded and compressed Index.
+  /// will be included in the payload. It is an encoded and compressed RowSet.
   effective_viewport: [byte];
 
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
 
-  /// This is an encoded and compressed Index of rows that were added in this update.
+  /// This is an encoded and compressed RowSet that were added in this update.
   added_rows: [byte];
 
-  /// This is an encoded and compressed Index of rows that were removed in this update.
+  /// This is an encoded and compressed RowSet that were removed in this update.
   removed_rows: [byte];
 
   /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
-  /// This is an encoded and compressed Index of rows that were included with this update.
+  /// This is an encoded and compressed RowSet that were included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
   added_rows_included: [byte];
