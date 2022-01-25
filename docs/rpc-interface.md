@@ -19,11 +19,11 @@ title: RPC Interface
 -->
 
 The Barrage extension works by sending additional metadata via the `app_metadata` field on `FlightData`. This metadata
-is used to communicate the necessary additional information between server and client. These types are flatbuffers, so 
+is used to communicate the necessary additional information between server and client. These types are flatbuffers, so
 that we may more easily lift the `app_metadata` into the `RecordBatch` flatbuffer once Arrow supports byte-array
 metadata, at that layer.
 
-The main subscription mechanism is initiated via a `DoExchange`. The client sends a SubscriptionRequest (or as many as 
+The main subscription mechanism is initiated via a `DoExchange`. The client sends a SubscriptionRequest (or as many as
 they like) and the server sends barrage updates to satisfy their subscription's requirements.
 
 ## Flat Buffer Definitions
@@ -142,6 +142,8 @@ table BarrageSubscriptionRequest {
   columns: [byte];
 
   /// This is an encoded and compressed RowSet in position-space to subscribe to.
+  ///
+  /// `viewport` is mutually exclusive with `tail_viewport`.
   viewport: [byte];
 
   /// Options to configure your subscription.
@@ -151,6 +153,8 @@ table BarrageSubscriptionRequest {
   /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every RowSet is converted from `i` to `n - i`
   /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
   /// experience for subscriptions that want to track the tail of a ticking table.
+  ///
+  /// `tail_viewport` is mutually exclusive with `viewport`.
   tail_viewport: [byte];
 }
 
@@ -178,10 +182,20 @@ table BarrageSnapshotRequest {
 
   /// This is an encoded and compressed RowSet in position-space to subscribe to. If not provided then the entire
   /// table is requested.
+  ///
+  /// `viewport` is mutually exclusive with `tail_viewport`.
   viewport: [byte];
 
   /// Options to configure your subscription.
   snapshot_options: BarrageSnapshotOptions;
+
+  /// This is an encoded and compressed RowSet in tail-position-space to subscribe to. For example consider the
+  /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every RowSet is converted from `i` to `n - i`
+  /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
+  /// experience for subscriptions that want to track the tail of a ticking table.
+  ///
+  /// `tail_viewport` is mutually exclusive with `viewport`.
+  tail_viewport: [byte];
 }
 
 /// Describes the table update stream the client would like to push to. This is similar to a DoPut but the client
@@ -227,16 +241,16 @@ table BarrageUpdateMetadata {
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
 
-  /// This is an encoded and compressed RowSet that were added in this update.
+  /// This is an encoded and compressed RowSet that was added in this update.
   added_rows: [byte];
 
-  /// This is an encoded and compressed RowSet that were removed in this update.
+  /// This is an encoded and compressed RowSet that was removed in this update.
   removed_rows: [byte];
 
   /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
-  /// This is an encoded and compressed RowSet that were included with this update.
+  /// This is an encoded and compressed RowSet that was included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
   added_rows_included: [byte];

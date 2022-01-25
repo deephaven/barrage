@@ -194,16 +194,16 @@ table BarrageUpdateMetadata {
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
 
-  /// This is an encoded and compressed RowSet that were added in this update.
+  /// This is an encoded and compressed RowSet that was added in this update.
   added_rows: [byte];
 
-  /// This is an encoded and compressed RowSet that were removed in this update.
+  /// This is an encoded and compressed RowSet that was removed in this update.
   removed_rows: [byte];
 
   /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
-  /// This is an encoded and compressed RowSet that were included with this update.
+  /// This is an encoded and compressed RowSet that was included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
   added_rows_included: [byte];
