@@ -28,7 +28,7 @@ enum BarrageMessageType : byte {
   BarrageSerializationOptions = 4,
   BarrageSubscriptionRequest = 5,
   BarrageUpdateMetadata = 6,
-  DoGetRequest = 7,
+  BarrageSnapshotRequest = 7,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -114,8 +114,22 @@ table BarrageSubscriptionRequest {
   subscription_options: BarrageSubscriptionOptions;
 }
 
-/// Describes the DoGet the client would like to acquire.
-table DoGetRequest {
+table BarrageSnapshotOptions {
+  /// see enum for details
+  column_conversion_mode: ColumnConversionMode = Stringify;
+
+  /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
+  /// by eliminating the additional complexity of the validity buffer.
+  use_deephaven_nulls: bool;
+
+  /// Specify a preferred batch size. Server is allowed to be configured to restrict possible values. Too small of a
+  /// batch size may be dominated with header costs as each batch is wrapped into a separate RecordBatch. Too large of
+  /// a payload and it may not fit within the maximum payload size. A good default might be 4096.
+  batch_size: int;
+}
+
+/// Describes the snapshot the client would like to acquire.
+table BarrageSnapshotRequest {
   /// Ticket for the source data set.
   ticket: [byte];
 
@@ -127,7 +141,7 @@ table DoGetRequest {
   viewport: [byte];
 
   /// Options to configure your subscription.
-  subscription_options: BarrageSubscriptionOptions;
+  snapshot_options: BarrageSnapshotOptions;
 }
 
 /// Holds all of the index data structures for the column being modified.
