@@ -25,7 +25,7 @@
 
   <groupId>io.deephaven.barrage</groupId>
   <artifactId>barrage-java-root</artifactId>
-  <version>0.3.1-SNAPSHOT</version>
+  <version>0.4.0</version>
   <packaging>pom</packaging>
 
   <name>Deephaven Data Labs' Barrage Java Root POM</name>
@@ -62,7 +62,7 @@
     <connection>scm:git:https://github.com/deephaven/barrage.git</connection>
     <developerConnection>scm:git:https://github.com/deephaven/barrage.git</developerConnection>
     <url>https://github.com/deephaven/barrage</url>
-    <tag>HEAD</tag>
+    <tag>v0.4.0</tag>
   </scm>
 
   <build>
