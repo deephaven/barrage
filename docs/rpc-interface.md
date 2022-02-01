@@ -62,7 +62,7 @@ enum BarrageMessageType : byte {
   BarrageSubscriptionRequest = 5,
   BarrageUpdateMetadata = 6,
   BarrageSnapshotRequest = 7,
-  BarragePublishRequest = 8,
+  BarragePublicationRequest = 8,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -186,7 +186,7 @@ table BarrageSnapshotRequest {
   reverse_viewport: bool;
 }
 
-table BarragePublishOptions {
+table BarragePublicationOptions {
   /// see enum for details
   column_conversion_mode: ColumnConversionMode = Stringify;
 
@@ -197,13 +197,13 @@ table BarragePublishOptions {
 
 /// Describes the table update stream the client would like to push to. This is similar to a DoPut but the client
 /// will send BarrageUpdateMetadata to explicitly describe the row key space. The updates sent adhere to the table
-/// update model semantics; thus BarragePublish enables the client to upload a ticking table.
-table BarragePublishRequest {
+/// update model semantics; thus BarragePublication enables the client to upload a ticking table.
+table BarragePublicationRequest {
   /// The destination Ticket.
   ticket: [byte];
 
   /// Options to configure your request.
-  publish_options: BarragePublishOptions;
+  publish_options: BarragePublicationOptions;
 }
 
 /// Holds all of the index data structures for the column being modified.
