@@ -142,20 +142,14 @@ table BarrageSubscriptionRequest {
   columns: [byte];
 
   /// This is an encoded and compressed RowSet in position-space to subscribe to.
-  ///
-  /// `viewport` is mutually exclusive with `tail_viewport`.
   viewport: [byte];
 
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
 
-  /// This is an encoded and compressed RowSet in tail-position-space to subscribe to. For example consider the
-  /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every RowSet is converted from `i` to `n - i`
-  /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
-  /// experience for subscriptions that want to track the tail of a ticking table.
-  ///
-  /// `tail_viewport` is mutually exclusive with `viewport`.
-  tail_viewport: [byte];
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
+  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  reverse_viewport: bool;
 }
 
 table BarrageSnapshotOptions {
@@ -182,20 +176,14 @@ table BarrageSnapshotRequest {
 
   /// This is an encoded and compressed RowSet in position-space to subscribe to. If not provided then the entire
   /// table is requested.
-  ///
-  /// `viewport` is mutually exclusive with `tail_viewport`.
   viewport: [byte];
 
   /// Options to configure your subscription.
   snapshot_options: BarrageSnapshotOptions;
 
-  /// This is an encoded and compressed RowSet in tail-position-space to subscribe to. For example consider the
-  /// tail_viewport of `[0-9]`, this would subscribe to the last ten rows. Every RowSet is converted from `i` to `n - i`
-  /// if the table has `n` rows. Letting the server manage the tail is more efficient for the client and the user
-  /// experience for subscriptions that want to track the tail of a ticking table.
-  ///
-  /// `tail_viewport` is mutually exclusive with `viewport`.
-  tail_viewport: [byte];
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
+  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  reverse_viewport: bool;
 }
 
 table BarragePublishOptions {
@@ -218,9 +206,9 @@ table BarragePublishRequest {
   publish_options: BarragePublishOptions;
 }
 
-/// Holds all of the RowSet data structures for the column being modified.
+/// Holds all of the index data structures for the column being modified.
 table BarrageModColumnMetadata {
-  /// This is an encoded and compressed RowSed for this column (within the viewport) that were modified.
+  /// This is an encoded and compressed RowSet for this column (within the viewport) that were modified.
   /// There is no notification for modifications outside of the viewport.
   modified_rows: [byte];
 }
