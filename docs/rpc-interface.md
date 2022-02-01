@@ -19,11 +19,11 @@ title: RPC Interface
 -->
 
 The Barrage extension works by sending additional metadata via the `app_metadata` field on `FlightData`. This metadata
-is used to communicate the necessary additional information between server and client. These types are flatbuffers, so 
+is used to communicate the necessary additional information between server and client. These types are flatbuffers, so
 that we may more easily lift the `app_metadata` into the `RecordBatch` flatbuffer once Arrow supports byte-array
 metadata, at that layer.
 
-The main subscription mechanism is initiated via a `DoExchange`. The client sends a SubscriptionRequest (or as many as 
+The main subscription mechanism is initiated via a `DoExchange`. The client sends a SubscriptionRequest (or as many as
 they like) and the server sends barrage updates to satisfy their subscription's requirements.
 
 ## Flat Buffer Definitions
@@ -62,6 +62,7 @@ enum BarrageMessageType : byte {
   BarrageSubscriptionRequest = 5,
   BarrageUpdateMetadata = 6,
   BarrageSnapshotRequest = 7,
+  BarragePublicationRequest = 8,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -140,11 +141,15 @@ table BarrageSubscriptionRequest {
   /// The bitset of columns to subscribe. If not provided then all columns are subscribed.
   columns: [byte];
 
-  /// This is an encoded and compressed Index of rows in position-space to subscribe to.
+  /// This is an encoded and compressed RowSet in position-space to subscribe to.
   viewport: [byte];
 
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
+
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
+  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  reverse_viewport: bool;
 }
 
 table BarrageSnapshotOptions {
@@ -169,17 +174,38 @@ table BarrageSnapshotRequest {
   /// The bitset of columns to request. If not provided then all columns are requested.
   columns: [byte];
 
-  /// This is an encoded and compressed Index of rows in position-space to subscribe to. If not provided then the entire
+  /// This is an encoded and compressed RowSet in position-space to subscribe to. If not provided then the entire
   /// table is requested.
   viewport: [byte];
 
   /// Options to configure your subscription.
   snapshot_options: BarrageSnapshotOptions;
+
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
+  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  reverse_viewport: bool;
+}
+
+table BarragePublicationOptions {
+  /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
+  /// by eliminating the additional complexity of the validity buffer.
+  use_deephaven_nulls: bool;
+}
+
+/// Describes the table update stream the client would like to push to. This is similar to a DoPut but the client
+/// will send BarrageUpdateMetadata to explicitly describe the row key space. The updates sent adhere to the table
+/// update model semantics; thus BarragePublication enables the client to upload a ticking table.
+table BarragePublicationRequest {
+  /// The destination Ticket.
+  ticket: [byte];
+
+  /// Options to configure your request.
+  publish_options: BarragePublicationOptions;
 }
 
 /// Holds all of the index data structures for the column being modified.
 table BarrageModColumnMetadata {
-  /// This is an encoded and compressed Index of rows for this column (within the viewport) that were modified.
+  /// This is an encoded and compressed RowSet for this column (within the viewport) that were modified.
   /// There is no notification for modifications outside of the viewport.
   modified_rows: [byte];
 }
@@ -203,22 +229,22 @@ table BarrageUpdateMetadata {
   is_snapshot: bool;
 
   /// If this is a snapshot and the subscription is a viewport, then the effectively subscribed viewport
-  /// will be included in the payload. It is an encoded and compressed Index.
+  /// will be included in the payload. It is an encoded and compressed RowSet.
   effective_viewport: [byte];
 
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
 
-  /// This is an encoded and compressed Index of rows that were added in this update.
+  /// This is an encoded and compressed RowSet that was added in this update.
   added_rows: [byte];
 
-  /// This is an encoded and compressed Index of rows that were removed in this update.
+  /// This is an encoded and compressed RowSet that was removed in this update.
   removed_rows: [byte];
 
   /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
-  /// This is an encoded and compressed Index of rows that were included with this update.
+  /// This is an encoded and compressed RowSet that was included with this update.
   /// (the server may include rows not in addedRows if this is a viewport subscription to refresh
   ///  unmodified rows that were scoped into view)
   added_rows_included: [byte];
