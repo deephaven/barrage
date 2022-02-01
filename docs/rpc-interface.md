@@ -62,7 +62,7 @@ enum BarrageMessageType : byte {
   BarrageSubscriptionRequest = 5,
   BarrageUpdateMetadata = 6,
   BarrageSnapshotRequest = 7,
-  DoPushRequest = 8,
+  BarragePublishRequest = 8,
 
   // enum values greater than 127 are reserved for custom client use
 }
@@ -198,15 +198,24 @@ table BarrageSnapshotRequest {
   tail_viewport: [byte];
 }
 
+table BarragePublishOptions {
+  /// see enum for details
+  column_conversion_mode: ColumnConversionMode = Stringify;
+
+  /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
+  /// by eliminating the additional complexity of the validity buffer.
+  use_deephaven_nulls: bool;
+}
+
 /// Describes the table update stream the client would like to push to. This is similar to a DoPut but the client
 /// will send BarrageUpdateMetadata to explicitly describe the row key space. The updates sent adhere to the table
-/// update model semantics; thus DoPush enables the client to upload a ticking table.
-table DoPushRequest {
+/// update model semantics; thus BarragePublish enables the client to upload a ticking table.
+table BarragePublishRequest {
   /// The destination Ticket.
   ticket: [byte];
 
   /// Options to configure your request.
-  subscription_options: BarrageSubscriptionOptions;
+  publish_options: BarragePublishOptions;
 }
 
 /// Holds all of the RowSet data structures for the column being modified.
