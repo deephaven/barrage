@@ -154,9 +154,6 @@ table BarrageSnapshotRequest {
 }
 
 table BarragePublicationOptions {
-  /// see enum for details
-  column_conversion_mode: ColumnConversionMode = Stringify;
-
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
   use_deephaven_nulls: bool;
