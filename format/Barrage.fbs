@@ -199,10 +199,6 @@ table BarrageUpdateMetadata {
   /// will be included in the payload. It is an encoded and compressed RowSet.
   effective_viewport: [byte];
 
-  /// When this is set the effective_viewport RowSet will be inverted against the length of the table. That is to say the
-  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
-  effective_reverse_viewport: bool;
-
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
 
@@ -222,4 +218,8 @@ table BarrageUpdateMetadata {
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
   mod_column_nodes: [BarrageModColumnMetadata];
+
+  /// When this is set the effective_viewport RowSet will be inverted against the length of the table. That is to say the
+  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  effective_reverse_viewport: bool;
 }
