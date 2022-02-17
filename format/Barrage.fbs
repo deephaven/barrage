@@ -114,8 +114,8 @@ table BarrageSubscriptionRequest {
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
 
-  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
-  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
   reverse_viewport: bool;
 }
 
@@ -148,8 +148,8 @@ table BarrageSnapshotRequest {
   /// Options to configure your subscription.
   snapshot_options: BarrageSnapshotOptions;
 
-  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
-  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
   reverse_viewport: bool;
 }
 
@@ -218,4 +218,8 @@ table BarrageUpdateMetadata {
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
   mod_column_nodes: [BarrageModColumnMetadata];
+
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
+  effective_reverse_viewport: bool;
 }
