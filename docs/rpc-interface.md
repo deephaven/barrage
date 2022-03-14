@@ -141,14 +141,15 @@ table BarrageSubscriptionRequest {
   /// The bitset of columns to subscribe. If not provided then all columns are subscribed.
   columns: [byte];
 
-  /// This is an encoded and compressed RowSet in position-space to subscribe to.
+  /// This is an encoded and compressed RowSet in position-space to subscribe to. If not provided then the entire
+  /// table is requested.
   viewport: [byte];
 
   /// Options to configure your subscription.
   subscription_options: BarrageSubscriptionOptions;
 
-  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
-  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
   reverse_viewport: bool;
 }
 
@@ -181,8 +182,8 @@ table BarrageSnapshotRequest {
   /// Options to configure your subscription.
   snapshot_options: BarrageSnapshotOptions;
 
-  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say the
-  /// every index value is converted from `i` to `n - i` if the table has `n` rows.
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
   reverse_viewport: bool;
 }
 
@@ -203,7 +204,7 @@ table BarragePublicationRequest {
   publish_options: BarragePublicationOptions;
 }
 
-/// Holds all of the index data structures for the column being modified.
+/// Holds all of the rowset data structures for the column being modified.
 table BarrageModColumnMetadata {
   /// This is an encoded and compressed RowSet for this column (within the viewport) that were modified.
   /// There is no notification for modifications outside of the viewport.
@@ -241,7 +242,7 @@ table BarrageUpdateMetadata {
   /// This is an encoded and compressed RowSet that was removed in this update.
   removed_rows: [byte];
 
-  /// This is an encoded and compressed IndexShiftData describing how the keyspace of unmodified rows changed.
+  /// This is an encoded and compressed RowSetShiftData describing how the keyspace of unmodified rows changed.
   shift_data: [byte];
 
   /// This is an encoded and compressed RowSet that was included with this update.
@@ -251,6 +252,9 @@ table BarrageUpdateMetadata {
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
   mod_column_nodes: [BarrageModColumnMetadata];
-}
 
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
+  effective_reverse_viewport: bool;
+}
 ```
