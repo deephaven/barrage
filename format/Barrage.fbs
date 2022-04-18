@@ -182,10 +182,10 @@ table BarrageModColumnMetadata {
 /// batch for a ticking barrage table.
 table BarrageUpdateMetadata {
   /// The number of record batches that describe rows added (may be zero).
-  num_add_batches: ushort;
+  num_add_batches: long;
 
   /// The number of record batches that describe rows modified (may be zero).
-  num_mod_batches: ushort;
+  num_mod_batches: long;
 
   /// This batch is generated from an upstream table that ticks independently of the stream. If
   /// multiple events are coalesced into one update, the server may communicate that here for
