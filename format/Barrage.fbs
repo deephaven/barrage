@@ -98,6 +98,11 @@ table BarrageSubscriptionOptions {
   /// batch size may be dominated with header costs as each batch is wrapped into a separate RecordBatch. Too large of
   /// a payload and it may not fit within the maximum payload size. A good default might be 4096.
   batch_size: int;
+
+  /// Specify a maximum allowed message size. Server will enforce this limit by reducing batch size (to a lower limit
+  /// of one row per batch). If the message size limit cannot be met due to large row sizes, the server will throw a
+  /// `Status.RESOURCE_EXHAUSTED` exception
+  max_message_size: int;
 }
 
 /// Describes the subscription the client would like to acquire.
@@ -132,6 +137,11 @@ table BarrageSnapshotOptions {
   /// batch size may be dominated with header costs as each batch is wrapped into a separate RecordBatch. Too large of
   /// a payload and it may not fit within the maximum payload size. A good default might be 4096.
   batch_size: int;
+
+  /// Specify a maximum allowed message size. Server will enforce this limit by reducing batch size (to a lower limit
+  /// of one row per batch). If the message size limit cannot be met due to large row sizes, the server will throw a
+  /// `Status.RESOURCE_EXHAUSTED` exception
+  max_message_size: int;
 }
 
 /// Describes the snapshot the client would like to acquire.
@@ -181,12 +191,6 @@ table BarrageModColumnMetadata {
 /// A data header describing the shared memory layout of a "record" or "row"
 /// batch for a ticking barrage table.
 table BarrageUpdateMetadata {
-  /// The number of record batches that describe rows added (may be zero).
-  num_add_batches: long;
-
-  /// The number of record batches that describe rows modified (may be zero).
-  num_mod_batches: long;
-
   /// This batch is generated from an upstream table that ticks independently of the stream. If
   /// multiple events are coalesced into one update, the server may communicate that here for
   /// informational purposes.
@@ -199,6 +203,10 @@ table BarrageUpdateMetadata {
   /// If this is a snapshot and the subscription is a viewport, then the effectively subscribed viewport
   /// will be included in the payload. It is an encoded and compressed RowSet.
   effective_viewport: [byte];
+
+  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
+  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
+  effective_reverse_viewport: bool;
 
   /// If this is a snapshot, then the effectively subscribed column set will be included in the payload.
   effective_column_set: [byte];
@@ -219,8 +227,4 @@ table BarrageUpdateMetadata {
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
   mod_column_nodes: [BarrageModColumnMetadata];
-
-  /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
-  /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
-  effective_reverse_viewport: bool;
 }
