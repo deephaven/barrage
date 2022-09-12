@@ -23,12 +23,13 @@ is highly recommended supplement material.
 
 ## Row Set
 
-Many of the messages that are sent by Barrage identify the set of rows that this update affects. These are ordered 
+Many of the messages that are sent by Barrage identify the set of rows that this update affects. These are ordered
 sets of rows in row key space. Sometimes we refer to these as an Index.
 
-To discuss sets of rows we need to be aware that each row of data has two identifiers. 
- - Row Position Id
- - Row Key Id
+To discuss sets of rows we need to be aware that each row of data has two identifiers.
+
+- Row Position Id
+- Row Key Id
 
 A RowSet is an ordered set of rows and may represent either the table's key-space
 or the table's position-space. Sometimes we refer to a row set as an Index.
@@ -38,7 +39,7 @@ Indexes have a variety of uses. They:
 - describe which rows exist in a table (key-space)
 - describe which rows were added/removed/modified in a table (key-space)
 - describe a viewport (position-space)
-- 
+
 ### Row Positions
 
 If a table has `n` rows then it has a position space of `[0, n-1]`. It is simply the ordering of rows if they were to
@@ -120,7 +121,7 @@ To properly apply an update you must take care to apply it in order:
 4. apply any modification that affects your state
 
 Modified columns are independent of each other and may
-have different sets of modified rows. This is caused by coalescing that must occur when the engine 
+have different sets of modified rows. This is caused by coalescing that must occur when the engine
 updates more frequently than the subscription allows.
 
 ## Snapshot
