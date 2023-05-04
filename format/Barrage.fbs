@@ -1,4 +1,4 @@
-// Copyright 2020 Deephaven Data Labs
+// Copyright 2023 Deephaven Data Labs
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -97,12 +97,18 @@ table BarrageSubscriptionOptions {
   /// Specify a preferred batch size. Server is allowed to be configured to restrict possible values. Too small of a
   /// batch size may be dominated with header costs as each batch is wrapped into a separate RecordBatch. Too large of
   /// a payload and it may not fit within the maximum payload size. A good default might be 4096.
+  ///
+  /// a batch_size of -1 indicates that the server should avoid batching a single logical message
   batch_size: int;
 
   /// Specify a maximum allowed message size. Server will enforce this limit by reducing batch size (to a lower limit
   /// of one row per batch). If the message size limit cannot be met due to large row sizes, the server will throw a
   /// `Status.RESOURCE_EXHAUSTED` exception
   max_message_size: int;
+
+  /// If true, the server will wrap columns with a list. This is useful for clients that do not support modified batches
+  /// with columns of differing lengths.
+  columns_as_list: bool;
 }
 
 /// Describes the subscription the client would like to acquire.
