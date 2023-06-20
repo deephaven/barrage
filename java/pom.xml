@@ -37,7 +37,6 @@
     <dep.fbs.version>1.12.0</dep.fbs.version>
     <dep.flatc.version>1.12.0</dep.flatc.version>
     <dep.arrow.version>5.0.0</dep.arrow.version>
-    <dep.guava.version>31.1-jre</dep.guava.version>
     <forkCount>2</forkCount>
     <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
   </properties>
@@ -466,11 +465,6 @@
         <groupId>com.google.flatbuffers</groupId>
         <artifactId>flatbuffers-java</artifactId>
         <version>${dep.fbs.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${dep.guava.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.arrow</groupId>
