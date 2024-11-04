@@ -25,7 +25,7 @@
 
   <groupId>io.deephaven.barrage</groupId>
   <artifactId>barrage-java-root</artifactId>
-  <version>0.6.1-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Deephaven Data Labs' Barrage Java Root POM</name>
@@ -34,9 +34,9 @@
 
   <properties>
     <target.gen.source.path>${project.basedir}/target/generated-sources</target.gen.source.path>
-    <dep.fbs.version>1.12.0</dep.fbs.version>
+    <dep.fbs.version>24.3.25</dep.fbs.version>
     <dep.flatc.version>1.12.0</dep.flatc.version>
-    <dep.arrow.version>5.0.0</dep.arrow.version>
+    <dep.arrow.version>18.0.0</dep.arrow.version>
     <forkCount>2</forkCount>
     <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
   </properties>

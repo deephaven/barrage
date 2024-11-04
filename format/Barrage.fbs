@@ -19,10 +19,7 @@ enum BarrageMessageType : byte {
   /// if the msg_payload is empty.
   None = 0,
 
-  /// for session management (not-yet-used)
-  NewSessionRequest = 1,
-  RefreshSessionRequest = 2,
-  SessionInfoResponse = 3,
+  /// enum values 1 - 3 are reserved for future use
 
   /// for subscription parsing/management (aka DoPut, DoExchange)
   BarrageSerializationOptions = 4,
@@ -47,42 +44,13 @@ table BarrageMessageWrapper {
   msg_payload: [byte];
 }
 
-/// Establish a new session.
-table NewSessionRequest {
-  /// A nested protocol version (gets delegated to handshake)
-  protocol_version: uint;
-
-  /// Arbitrary auth/handshake info.
-  payload: [byte];
-}
-
-/// Refresh the provided session.
-table RefreshSessionRequest {
-  /// this session token is only required if it is the first request of a handshake rpc stream
-  session: [byte];
-}
-
-/// Information about the current session state.
-table SessionInfoResponse {
-  /// this is the metadata header to identify this session with future requests; it must be lower-case and remain static for the life of the session
-  metadata_header: [byte];
-
-  /// this is the session_token; note that it may rotate
-  session_token: [byte];
-
-  /// a suggested time for the user to refresh the session if they do not do so earlier; value is denoted in milliseconds since epoch
-  token_refresh_deadline_ms: long;
-}
-
-/// There will always be types that cannot be easily supported over IPC. These are the options:
-///   Stringify (default) - Pretend the column is a string when sending over Arrow Flight (default)
-///   JavaSerialization   - Use java serialization; the client is responsible for the deserialization
-///   ThrowError          - Refuse to send the column and throw an internal error sharing as much detail as possible
+/// There will always be types that cannot be easily supported over IPC. While column conversion mode is no longer
+/// supported, users can more explicitly configure the encoding/decoding behavior of the server.
 enum ColumnConversionMode : byte { Stringify = 1, JavaSerialization, ThrowError }
 
 table BarrageSubscriptionOptions {
-  /// see enum for details
-  column_conversion_mode: ColumnConversionMode = Stringify;
+  /// Column conversion mode is no longer supported.
+  column_conversion_mode: ColumnConversionMode = Stringify (deprecated);
 
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
@@ -109,6 +77,12 @@ table BarrageSubscriptionOptions {
   /// If true, the server will wrap columns with a list. This is useful for clients that do not support modified batches
   /// with columns of differing lengths.
   columns_as_list: bool;
+
+  /// If zero, list lengths will not be limited. If greater than zero, the server will limit the length of any encoded
+  /// list / array to the first n elements, where n is the specified value. If the column value has length less than
+  /// zero, the server will send the last n elements of the list / array. If the column value has length greater than
+  /// the limit, the server will encode the list up to the limit and append an arbitrary value to indicate truncation.
+  preview_list_length_limit: int = 0;
 }
 
 /// Describes the subscription the client would like to acquire.
@@ -129,11 +103,15 @@ table BarrageSubscriptionRequest {
   /// When this is set the viewport RowSet will be inverted against the length of the table. That is to say
   /// every position value is converted from `i` to `n - i - 1` if the table has `n` rows.
   reverse_viewport: bool;
+
+  /// If this is set, the server will parrot this subscription token in the response. This token can be used to identify
+  /// which subscription the server is now respecting.
+  subscription_token: [byte];
 }
 
 table BarrageSnapshotOptions {
-  /// see enum for details
-  column_conversion_mode: ColumnConversionMode = Stringify;
+  /// Column conversion mode is no longer supported.
+  column_conversion_mode: ColumnConversionMode = Stringify (deprecated);
 
   /// Deephaven reserves a value in the range of primitives as a custom NULL value. This enables more efficient transmission
   /// by eliminating the additional complexity of the validity buffer.
@@ -148,6 +126,12 @@ table BarrageSnapshotOptions {
   /// of one row per batch). If the message size limit cannot be met due to large row sizes, the server will throw a
   /// `Status.RESOURCE_EXHAUSTED` exception
   max_message_size: int;
+
+  /// If zero, list lengths will not be limited. If greater than zero, the server will limit the length of any encoded
+  /// list / array to the first n elements, where n is the specified value. If the column value has length less than
+  /// zero, the server will send the last n elements of the list / array. If the column value has length greater than
+  /// the limit, the server will encode the list up to the limit and append an arbitrary value to indicate truncation.
+  preview_list_length_limit: int = 0;
 }
 
 /// Describes the snapshot the client would like to acquire.
