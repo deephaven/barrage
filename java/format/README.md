@@ -6,7 +6,7 @@
 $ flatc --version
 flatc version 24.3.25
 $ grep "dep.fbs.version" java/pom.xml
-    <dep.fbs.version>1.12.0</dep.fbs.version>
+    <dep.fbs.version>24.3.25</dep.fbs.version>
 ```
 
 2. Generate the flatbuffer java files by performing the following:
