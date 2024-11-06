@@ -17,11 +17,8 @@ cd $BARRAGE_HOME
 rm -rf java/format/src
 # regenerate from the .fbs files
 flatc --java -o java/format/src/main/java format/*.fbs
-# prepend license header
-find java/format/src -type f | while read file; do
-  (cat header | while read line; do echo "// $line"; done; cat $file) > $file.tmp
-  mv $file.tmp $file
-done
+# generate license headers
+mvn compile
 ```
 
 3. Ensure any new files are added to the git repository:

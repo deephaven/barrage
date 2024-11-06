@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>barrage-format</artifactId>
-  <packaging>jar</packaging>
   <name>Barrage Format</name>
   <description>Generated Java files from the IPC Flatbuffer definitions.</description>
 
@@ -35,4 +34,28 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <!-- add the license header to the committed generated files -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>4.6</version>
+        <configuration>
+          <header>${basedir}/../../header</header>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
