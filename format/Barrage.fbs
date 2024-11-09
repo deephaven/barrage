@@ -20,6 +20,9 @@ enum BarrageMessageType : byte {
   None = 0,
 
   /// enum values 1 - 3 are reserved for future use
+  UNUSED_1 = 1,
+  UNUSED_2 = 2,
+  UNUSED_3 = 3,
 
   /// for subscription parsing/management (aka DoPut, DoExchange)
   BarrageSerializationOptions = 4,
@@ -85,7 +88,7 @@ table BarrageSubscriptionOptions {
   ///
   /// Note: The server is unable to indicate when truncation occurs. To detect truncation request one more element than
   /// the maximum number you wish to display.
-  preview_list_length_limit: int = 0;
+  preview_list_length_limit: long = 0;
 }
 
 /// Describes the subscription the client would like to acquire.
@@ -137,7 +140,7 @@ table BarrageSnapshotOptions {
   ///
   /// Note: The server is unable to indicate when truncation occurs. To detect truncation request one more element than
   /// the maximum number you wish to display.
-  preview_list_length_limit: int = 0;
+  preview_list_length_limit: long = 0;
 }
 
 /// Describes the snapshot the client would like to acquire.
