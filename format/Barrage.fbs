@@ -78,10 +78,13 @@ table BarrageSubscriptionOptions {
   /// with columns of differing lengths.
   columns_as_list: bool;
 
-  /// If zero, list lengths will not be limited. If greater than zero, the server will limit the length of any encoded
-  /// list / array to the first n elements, where n is the specified value. If the column value has length less than
-  /// zero, the server will send the last n elements of the list / array. If the column value has length greater than
-  /// the limit, the server will encode the list up to the limit and append an arbitrary value to indicate truncation.
+  /// The maximum length of any list / array to encode.
+  /// - If zero, list lengths will not be limited.
+  /// - If non-zero, the server will limit the length of any encoded list / array to the absolute value of the returned length.
+  /// - If less than zero, the server will encode elements from the end of the list / array, rather than from the beginning.
+  ///
+  /// Note: The server is unable to indicate when truncation occurs. To detect truncation request one more element than
+  /// the maximum number you wish to display.
   preview_list_length_limit: int = 0;
 }
 
@@ -127,10 +130,13 @@ table BarrageSnapshotOptions {
   /// `Status.RESOURCE_EXHAUSTED` exception
   max_message_size: int;
 
-  /// If zero, list lengths will not be limited. If greater than zero, the server will limit the length of any encoded
-  /// list / array to the first n elements, where n is the specified value. If the column value has length less than
-  /// zero, the server will send the last n elements of the list / array. If the column value has length greater than
-  /// the limit, the server will encode the list up to the limit and append an arbitrary value to indicate truncation.
+  /// The maximum length of any list / array to encode.
+  /// - If zero, list lengths will not be limited.
+  /// - If non-zero, the server will limit the length of any encoded list / array to the absolute value of the returned length.
+  /// - If less than zero, the server will encode elements from the end of the list / array, rather than from the beginning.
+  ///
+  /// Note: The server is unable to indicate when truncation occurs. To detect truncation request one more element than
+  /// the maximum number you wish to display.
   preview_list_length_limit: int = 0;
 }
 
