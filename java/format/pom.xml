@@ -20,20 +20,12 @@
   <parent>
     <artifactId>barrage-java-root</artifactId>
     <groupId>io.deephaven.barrage</groupId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>barrage-format</artifactId>
-  <packaging>jar</packaging>
   <name>Barrage Format</name>
   <description>Generated Java files from the IPC Flatbuffer definitions.</description>
-
-  <properties>
-    <flatc.download.skip>false</flatc.download.skip>
-    <flatc.executable>${project.build.directory}/flatc-${os.detected.classifier}-${dep.flatc.version}.exe</flatc.executable>
-    <flatc.generated.files>${project.build.directory}/generated-sources/flatc</flatc.generated.files>
-    <os-maven-plugin.version>1.5.0.Final</os-maven-plugin.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -42,119 +34,28 @@
     </dependency>
   </dependencies>
 
- <build>
-  <extensions>
-    <!-- provides os.detected.classifier (i.e. linux-x86_64, osx-x86_64) property -->
-    <extension>
-      <groupId>kr.motd.maven</groupId>
-      <artifactId>os-maven-plugin</artifactId>
-      <version>${os-maven-plugin.version}</version>
-    </extension>
-  </extensions>
-
-  <plugins>
-    <plugin> <!-- download the flatbuffer compiler -->
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-dependency-plugin</artifactId>
-      <executions>
-        <execution>
-          <id>copy-flatc</id>
-          <phase>initialize</phase>
-          <goals>
-            <goal>copy</goal>
-          </goals>
-          <configuration>
-            <artifactItems>
-              <artifactItem>
-                <groupId>com.github.shinanca</groupId>
-                <artifactId>flatc-${os.detected.classifier}</artifactId>
-                <version>${dep.flatc.version}</version>
-                <type>exe</type>
-                <overWrite>true</overWrite>
-                <outputDirectory>${project.build.directory}</outputDirectory>
-              </artifactItem>
-            </artifactItems>
-            <skip>${flatc.download.skip}</skip>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-    <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>exec-maven-plugin</artifactId>
-      <version>1.4.0</version>
-      <executions>
-        <execution> <!-- make the flatbuffer compiler executable -->
-          <id>script-chmod</id>
-          <goals>
-            <goal>exec</goal>
-          </goals>
-          <phase>generate-sources</phase>
-          <configuration>
-            <executable>chmod</executable>
-            <arguments>
-              <argument>+x</argument>
-              <argument>${project.build.directory}/flatc-${os.detected.classifier}-${dep.flatc.version}.exe</argument>
-            </arguments>
-            <skip>${flatc.download.skip}</skip>
-          </configuration>
-        </execution>
-        <execution> <!-- generate sources by executing the flatbuffer compiler -->
-          <goals>
-            <goal>exec</goal>
-          </goals>
-          <phase>generate-sources</phase>
-          <configuration>
-            <executable>${flatc.executable}</executable>
-            <arguments>
-              <argument>-j</argument>
-              <argument>-o</argument>
-              <argument>${flatc.generated.files}</argument>
-              <argument>../../format/Barrage.fbs</argument>
-            </arguments>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-    <plugin> <!-- add the license header to the generated files -->
-      <groupId>com.mycila</groupId>
-      <artifactId>license-maven-plugin</artifactId>
-      <version>2.3</version>
-      <configuration>
-        <header>${basedir}/../../header</header>
-        <includes>
-          <include>**/*.java</include>
-        </includes>
-      </configuration>
-      <executions>
-        <execution>
-          <phase>process-sources</phase>
-          <goals>
-            <goal>format</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-    <plugin> <!-- add generated sources to classpath -->
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>build-helper-maven-plugin</artifactId>
-      <version>1.9.1</version>
-      <executions>
-        <execution>
-          <id>add-generated-sources-to-classpath</id>
-          <phase>generate-sources</phase>
-          <goals>
-            <goal>add-source</goal>
-          </goals>
-          <configuration>
-            <sources>
-              <source>${flatc.generated.files}</source>
-            </sources>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
-
-</build>
+  <build>
+    <plugins>
+      <!-- add the license header to the committed generated files -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>4.6</version>
+        <configuration>
+          <header>${basedir}/../../header</header>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

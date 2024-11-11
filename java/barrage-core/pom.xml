@@ -19,31 +19,31 @@
   <parent>
     <groupId>io.deephaven.barrage</groupId>
     <artifactId>barrage-java-root</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>barrage-core</artifactId>
   <name>Deephaven Barrage Core</name>
   <description>An RPC mechanism for transferring ticking Arrow data.</description>
-  <packaging>jar</packaging>
 
   <properties>
-    <dep.grpc.version>1.58.0</dep.grpc.version>
-    <dep.protobuf.version>3.21.9</dep.protobuf.version>
-    <forkCount>1</forkCount>
+    <dep.grpc.version>1.65.0</dep.grpc.version>
+    <dep.protobuf.version>3.25.4</dep.protobuf.version>
+    <dep.guava.version>33.3.1-jre</dep.guava.version>
+    <protoOutDir>${project.build.directory}/generated-sources/protobuf</protoOutDir>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.grpc</groupId>
-      <artifactId>grpc-core</artifactId>
+      <artifactId>grpc-protobuf</artifactId>
       <version>${dep.grpc.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-protobuf</artifactId>
-      <version>${dep.grpc.version}</version>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${dep.guava.version}</version>
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
@@ -61,15 +61,8 @@
       <version>${dep.grpc.version}</version>
     </dependency>
     <dependency>
-        <groupId>org.apache.arrow</groupId>
-        <artifactId>flight-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.api.grpc</groupId>
-      <artifactId>proto-google-common-protos</artifactId>
-      <version>1.12.0</version>
-      <scope>test</scope>
+      <groupId>org.apache.arrow</groupId>
+      <artifactId>flight-core</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -81,69 +74,6 @@
       </extension>
     </extensions>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.4.0</version>
-        <executions>
-          <execution>
-            <id>shade-main</id>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>shaded</shadedClassifierName>
-              <artifactSet>
-                <includes>
-                  <include>io.grpc:*</include>
-                  <include>com.google.protobuf:*</include>
-                </includes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>com.google.protobuf</pattern>
-                  <shadedPattern>io.deephaven.barrage.com.google.protobuf</shadedPattern>
-                </relocation>
-              </relocations>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-              </transformers>
-            </configuration>
-          </execution>
-          <execution>
-            <id>shade-ext</id>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>shaded-ext</shadedClassifierName>
-              <artifactSet>
-                <includes>
-                  <include>io.grpc:*</include>
-                  <include>com.google.protobuf:*</include>
-                </includes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>com.google.protobuf</pattern>
-                  <shadedPattern>io.deephaven.barrage.com.google.protobuf</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>com.google.common</pattern>
-                  <shadedPattern>io.deephaven.barrage.com.google.common</shadedPattern>
-                </relocation>
-              </relocations>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
@@ -159,7 +89,7 @@
             <id>src</id>
             <configuration>
               <protoSourceRoot>${basedir}/../../format/</protoSourceRoot>
-              <outputDirectory>${project.build.directory}/generated-sources/protobuf</outputDirectory>
+              <outputDirectory>${protoOutDir}</outputDirectory>
               <includes>
                   <!-- Note we only want to include the BrowserFlight service! -->
                   <include>**/BrowserFlight.proto</include>
@@ -172,22 +102,24 @@
           </execution>
         </executions>
       </plugin>
+      <!-- add the license header to the generated files -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>4.6</version>
+        <configuration>
+          <header>${basedir}/../../header</header>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+          <defaultBasedir>${protoOutDir}</defaultBasedir>
+        </configuration>
         <executions>
           <execution>
-            <id>analyze</id>
-            <phase>verify</phase>
+            <phase>process-sources</phase>
             <goals>
-              <goal>analyze-only</goal>
+              <goal>format</goal>
             </goals>
-            <configuration>
-                <ignoredDependencies>
-                    <ignoredDependency>io.grpc:grpc-core:jar:1.30.2</ignoredDependency>
-                    <ignoredDependency>io.grpc:grpc-context:jar:1.30.2</ignoredDependency>
-                </ignoredDependencies>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -204,27 +136,9 @@
             </goals>
             <configuration>
               <sources>
-                <source>${project.build.directory}/generated-sources/protobuf</source>
+                <source>${protoOutDir}</source>
               </sources>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.4.2</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

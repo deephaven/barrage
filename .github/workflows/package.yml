@@ -19,7 +19,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v1
         with:
-          java-version: '8.0.282'
+          java-version: '17.0.11'
 
       - name: Package with Maven
         run: mvn --file java/pom.xml --batch-mode package

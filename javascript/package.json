@@ -1,6 +1,6 @@
 {
   "name": "@deephaven/barrage",
-  "version": "0.6.1-snapshot.0",
+  "version": "0.7.0-snapshot.0",
   "description": "Deephaven Barrage protocol",
   "main": "dist/barrage.js",
   "types": "dist/typings/index.d.ts",
