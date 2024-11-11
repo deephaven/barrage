@@ -20,7 +20,7 @@
   <parent>
     <artifactId>barrage-java-root</artifactId>
     <groupId>io.deephaven.barrage</groupId>
-    <version>0.7.0</version>
+    <version>0.7.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>barrage-format</artifactId>
