@@ -25,7 +25,7 @@
 
   <groupId>io.deephaven.barrage</groupId>
   <artifactId>barrage-java-root</artifactId>
-  <version>0.7.2-SNAPSHOT</version>
+  <version>0.7.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Deephaven Data Labs' Barrage Java Root POM</name>
