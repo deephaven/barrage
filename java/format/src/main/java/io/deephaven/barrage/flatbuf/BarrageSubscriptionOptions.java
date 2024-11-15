@@ -72,12 +72,15 @@ public final class BarrageSubscriptionOptions extends Table {
    */
   public boolean columnsAsList() { int o = __offset(14); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
   /**
-   * If zero, list lengths will not be limited. If greater than zero, the server will limit the length of any encoded
-   * list / array to the first n elements, where n is the specified value. If the column value has length less than
-   * zero, the server will send the last n elements of the list / array. If the column value has length greater than
-   * the limit, the server will encode the list up to the limit and append an arbitrary value to indicate truncation.
+   * The maximum length of any list / array to encode.
+   * - If zero, list lengths will not be limited.
+   * - If non-zero, the server will limit the length of any encoded list / array to the absolute value of the returned length.
+   * - If less than zero, the server will encode elements from the end of the list / array, rather than from the beginning.
+   *
+   * Note: The server is unable to indicate when truncation occurs. To detect truncation request one more element than
+   * the maximum number you wish to display.
    */
-  public int previewListLengthLimit() { int o = __offset(16); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
+  public long previewListLengthLimit() { int o = __offset(16); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
 
   public static int createBarrageSubscriptionOptions(FlatBufferBuilder builder,
       boolean useDeephavenNulls,
@@ -85,7 +88,7 @@ public final class BarrageSubscriptionOptions extends Table {
       int batchSize,
       int maxMessageSize,
       boolean columnsAsList,
-      int previewListLengthLimit) {
+      long previewListLengthLimit) {
     builder.startTable(7);
     BarrageSubscriptionOptions.addPreviewListLengthLimit(builder, previewListLengthLimit);
     BarrageSubscriptionOptions.addMaxMessageSize(builder, maxMessageSize);
@@ -102,7 +105,7 @@ public final class BarrageSubscriptionOptions extends Table {
   public static void addBatchSize(FlatBufferBuilder builder, int batchSize) { builder.addInt(3, batchSize, 0); }
   public static void addMaxMessageSize(FlatBufferBuilder builder, int maxMessageSize) { builder.addInt(4, maxMessageSize, 0); }
   public static void addColumnsAsList(FlatBufferBuilder builder, boolean columnsAsList) { builder.addBoolean(5, columnsAsList, false); }
-  public static void addPreviewListLengthLimit(FlatBufferBuilder builder, int previewListLengthLimit) { builder.addInt(6, previewListLengthLimit, 0); }
+  public static void addPreviewListLengthLimit(FlatBufferBuilder builder, long previewListLengthLimit) { builder.addLong(6, previewListLengthLimit, 0L); }
   public static int endBarrageSubscriptionOptions(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

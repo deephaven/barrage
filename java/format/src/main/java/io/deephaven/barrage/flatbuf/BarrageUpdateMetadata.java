@@ -125,6 +125,10 @@ public final class BarrageUpdateMetadata extends Table {
   public int modColumnNodesLength() { int o = __offset(24); return o != 0 ? __vector_len(o) : 0; }
   public io.deephaven.barrage.flatbuf.BarrageModColumnMetadata.Vector modColumnNodesVector() { return modColumnNodesVector(new io.deephaven.barrage.flatbuf.BarrageModColumnMetadata.Vector()); }
   public io.deephaven.barrage.flatbuf.BarrageModColumnMetadata.Vector modColumnNodesVector(io.deephaven.barrage.flatbuf.BarrageModColumnMetadata.Vector obj) { int o = __offset(24); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
+  /**
+   * The current size of the table.
+   */
+  public long tableSize() { int o = __offset(26); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
 
   public static int createBarrageUpdateMetadata(FlatBufferBuilder builder,
       long firstSeq,
@@ -137,8 +141,10 @@ public final class BarrageUpdateMetadata extends Table {
       int removedRowsOffset,
       int shiftDataOffset,
       int addedRowsIncludedOffset,
-      int modColumnNodesOffset) {
-    builder.startTable(11);
+      int modColumnNodesOffset,
+      long tableSize) {
+    builder.startTable(12);
+    BarrageUpdateMetadata.addTableSize(builder, tableSize);
     BarrageUpdateMetadata.addLastSeq(builder, lastSeq);
     BarrageUpdateMetadata.addFirstSeq(builder, firstSeq);
     BarrageUpdateMetadata.addModColumnNodes(builder, modColumnNodesOffset);
@@ -153,7 +159,7 @@ public final class BarrageUpdateMetadata extends Table {
     return BarrageUpdateMetadata.endBarrageUpdateMetadata(builder);
   }
 
-  public static void startBarrageUpdateMetadata(FlatBufferBuilder builder) { builder.startTable(11); }
+  public static void startBarrageUpdateMetadata(FlatBufferBuilder builder) { builder.startTable(12); }
   public static void addFirstSeq(FlatBufferBuilder builder, long firstSeq) { builder.addLong(0, firstSeq, 0L); }
   public static void addLastSeq(FlatBufferBuilder builder, long lastSeq) { builder.addLong(1, lastSeq, 0L); }
   public static void addIsSnapshot(FlatBufferBuilder builder, boolean isSnapshot) { builder.addBoolean(2, isSnapshot, false); }
@@ -185,6 +191,7 @@ public final class BarrageUpdateMetadata extends Table {
   public static void addModColumnNodes(FlatBufferBuilder builder, int modColumnNodesOffset) { builder.addOffset(10, modColumnNodesOffset, 0); }
   public static int createModColumnNodesVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
   public static void startModColumnNodesVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
+  public static void addTableSize(FlatBufferBuilder builder, long tableSize) { builder.addLong(11, tableSize, 0L); }
   public static int endBarrageUpdateMetadata(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;

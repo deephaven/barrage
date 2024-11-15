@@ -25,6 +25,11 @@ public final class BarrageMessageType {
   public static final byte None = 0;
   /**
    * enum values 1 - 3 are reserved for future use
+   */
+  public static final byte UNUSED_1 = 1;
+  public static final byte UNUSED_2 = 2;
+  public static final byte UNUSED_3 = 3;
+  /**
    * for subscription parsing/management (aka DoPut, DoExchange)
    */
   public static final byte BarrageSerializationOptions = 4;
@@ -33,7 +38,7 @@ public final class BarrageMessageType {
   public static final byte BarrageSnapshotRequest = 7;
   public static final byte BarragePublicationRequest = 8;
 
-  public static final String[] names = { "None", "", "", "", "BarrageSerializationOptions", "BarrageSubscriptionRequest", "BarrageUpdateMetadata", "BarrageSnapshotRequest", "BarragePublicationRequest", };
+  public static final String[] names = { "None", "UNUSED_1", "UNUSED_2", "UNUSED_3", "BarrageSerializationOptions", "BarrageSubscriptionRequest", "BarrageUpdateMetadata", "BarrageSnapshotRequest", "BarragePublicationRequest", };
 
   public static String name(int e) { return names[e]; }
 }
