@@ -226,4 +226,7 @@ table BarrageUpdateMetadata {
 
   /// The list of modified column data are in the same order as the field nodes on the schema.
   mod_column_nodes: [BarrageModColumnMetadata];
+
+  /// The current size of the table.
+  table_size: long;
 }
