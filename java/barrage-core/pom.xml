@@ -19,7 +19,7 @@
   <parent>
     <groupId>io.deephaven.barrage</groupId>
     <artifactId>barrage-java-root</artifactId>
-    <version>0.7.1-SNAPSHOT</version>
+    <version>0.7.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
