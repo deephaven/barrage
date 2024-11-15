@@ -18,6 +18,7 @@ rm -rf java/format/src
 # regenerate from the .fbs files
 flatc --java -o java/format/src/main/java format/*.fbs
 # generate license headers
+cd java
 mvn compile
 ```
 

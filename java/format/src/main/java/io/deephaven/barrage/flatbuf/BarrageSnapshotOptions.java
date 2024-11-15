@@ -58,18 +58,21 @@ public final class BarrageSnapshotOptions extends Table {
    */
   public int maxMessageSize() { int o = __offset(10); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
   /**
-   * If zero, list lengths will not be limited. If greater than zero, the server will limit the length of any encoded
-   * list / array to the first n elements, where n is the specified value. If the column value has length less than
-   * zero, the server will send the last n elements of the list / array. If the column value has length greater than
-   * the limit, the server will encode the list up to the limit and append an arbitrary value to indicate truncation.
+   * The maximum length of any list / array to encode.
+   * - If zero, list lengths will not be limited.
+   * - If non-zero, the server will limit the length of any encoded list / array to the absolute value of the returned length.
+   * - If less than zero, the server will encode elements from the end of the list / array, rather than from the beginning.
+   *
+   * Note: The server is unable to indicate when truncation occurs. To detect truncation request one more element than
+   * the maximum number you wish to display.
    */
-  public int previewListLengthLimit() { int o = __offset(12); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
+  public long previewListLengthLimit() { int o = __offset(12); return o != 0 ? bb.getLong(o + bb_pos) : 0L; }
 
   public static int createBarrageSnapshotOptions(FlatBufferBuilder builder,
       boolean useDeephavenNulls,
       int batchSize,
       int maxMessageSize,
-      int previewListLengthLimit) {
+      long previewListLengthLimit) {
     builder.startTable(5);
     BarrageSnapshotOptions.addPreviewListLengthLimit(builder, previewListLengthLimit);
     BarrageSnapshotOptions.addMaxMessageSize(builder, maxMessageSize);
@@ -82,7 +85,7 @@ public final class BarrageSnapshotOptions extends Table {
   public static void addUseDeephavenNulls(FlatBufferBuilder builder, boolean useDeephavenNulls) { builder.addBoolean(1, useDeephavenNulls, false); }
   public static void addBatchSize(FlatBufferBuilder builder, int batchSize) { builder.addInt(2, batchSize, 0); }
   public static void addMaxMessageSize(FlatBufferBuilder builder, int maxMessageSize) { builder.addInt(3, maxMessageSize, 0); }
-  public static void addPreviewListLengthLimit(FlatBufferBuilder builder, int previewListLengthLimit) { builder.addInt(4, previewListLengthLimit, 0); }
+  public static void addPreviewListLengthLimit(FlatBufferBuilder builder, long previewListLengthLimit) { builder.addLong(4, previewListLengthLimit, 0L); }
   public static int endBarrageSnapshotOptions(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;
