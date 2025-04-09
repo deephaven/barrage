@@ -27,9 +27,8 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Deploy Docs
+      - name: Set deploy version
         run: |
-          echo "Deploying docs for tag: ${{ github.event.inputs.tag || github.ref_name }}"
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             pr_number=${{ github.event.pull_request.number }}
             echo "version=pr-${pr_number}" >> $GITHUB_ENV
