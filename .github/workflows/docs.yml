@@ -25,15 +25,24 @@ jobs:
 
     steps:
 
+      # Checkout the repository
+      - name: Set ref variable
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          else
+            echo "ref=${{ github.event.inputs.tag || github.ref_name }}" >> $GITHUB_ENV
+
       - name: Docs
         run: |
-          echo "Resolved ref: ${{ github.event.inputs.tag || github.ref_name }}"
+          echo "Resolved event name: ${{ github.event_name }}"
+          echo "Resolved ref: ${{ env.ref }}"
 
-      # Checkout the repository
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.event.inputs.tag || github.ref_name }}
+          ref: ${{ env.ref }}
           
       - name: Deploy Docs
         run: |
