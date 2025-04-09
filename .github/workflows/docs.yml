@@ -31,11 +31,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
           else
-            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              echo "ref=dmckenzie_bring_docs_home" >> $GITHUB_ENV
-            else
-              echo "ref=48/merge" >> $GITHUB_ENV
-            fi
+            echo "ref=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
 
       - name: Docs
