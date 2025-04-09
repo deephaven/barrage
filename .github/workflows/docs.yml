@@ -1,18 +1,14 @@
 name: Build and Deploy Docs
 
 on:
-  # Trigger workflow manually with inputs
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag to checkout'
         required: true
-        default: 'latest'
-  # Trigger workflow automatically on new tag creation
   push:
     tags:
       - '*'
-  # Trigger workflow on pull request changes
   pull_request:
     branches:
       - 'main'
@@ -21,35 +17,19 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-
-      # Checkout the repository
-      - name: Set ref variable
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "ref=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-          else
-            echo "ref=${{ github.ref_name }}" >> $GITHUB_ENV
-          fi
-
-      - name: Docs
-        run: |
-          echo "Resolved event name: ${{ github.event_name }}"
-          echo "Resolved ref: ${{ env.ref }}"
-
-
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.ref }}
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
           
       - name: Deploy Docs
         run: |
           echo "Deploying docs for tag: ${{ github.event.inputs.tag || github.ref_name }}"
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            pr_number=$(echo "${{ github.ref_name }}" | grep -oP '^\d+')
+            pr_number=${{ github.event.pull_request.number }}
             echo "version=pr-${pr_number}" >> $GITHUB_ENV
             echo "production=false" >> $GITHUB_ENV
           else
@@ -63,20 +43,23 @@ jobs:
           source: docs/
           destination: deephaven/barrage/${{ env.version }}/
           production: ${{ env.production }}
-          temporary: ${{ env.production == 'true' && 'false' || 'true' }}
+          temporary: ${{ env.production != 'true' }}
           aws-role: ${{ vars.DOCS_AWS_ROLE }}
 
       - name: Comment on PR
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
         env:
             url: ${{ vars.DOCS_PREVIEW_URL }}
         with:
             script: |
                 const env = process.env;
+                if (!env.url) {
+                  throw new Error("DOCS_PREVIEW_URL is not defined");
+                }
                 github.rest.issues.createComment({
-                issue_number: env.version.replace('pr-', ''),
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `[Barrage docs preview](${env.url}/barrage/${env.version}/docs) (Available for 14 days)`
+                  issue_number: parseInt(env.version.replace('pr-', ''), 10),
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `[Barrage docs preview](${env.url}/barrage/${env.version}/docs) (Available for 14 days)`
                 });
