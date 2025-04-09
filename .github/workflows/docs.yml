@@ -33,15 +33,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.event.inputs.tag || github.ref_name }}
           
       - name: Deploy Docs
         run: |
           echo "Deploying docs for tag: ${{ github.event.inputs.tag || github.ref_name }}"
-          echo "version=${{ github.event.inputs.tag || github.ref_name }}" >> $GITHUB_ENV
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            pr_number=$(echo "${{ github.ref_name }}" | grep -oP '^\d+')
+            echo "version=pr-${pr_number}" >> $GITHUB_ENV
             echo "production=false" >> $GITHUB_ENV
           else
+            echo "version=${{ github.event.inputs.tag || github.ref_name }}" >> $GITHUB_ENV
             echo "production=true" >> $GITHUB_ENV
           fi
     
