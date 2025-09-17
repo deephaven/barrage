@@ -1,0 +1,20 @@
+name: Docs Check
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  docs-check:
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: docs-check-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check formatting
+        run: ./docs/format -c
+
+      - name: Validate docs
+        run: ./docs/validate

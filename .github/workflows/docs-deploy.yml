@@ -1,0 +1,42 @@
+name: Docs Deploy
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy (e.g. 1.2.3)"
+        required: true
+        default: "main"
+
+jobs:
+  docs-sync:
+    permissions:
+      id-token: write # Required to upload to AWS
+      contents: read
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: docs-sync-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Version
+        id: version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        # Remove the 'v' prefix from the tag if it exists
+        run: echo "version=${REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Sync docs to the salmon bucket
+        id: sync-docs
+        uses: deephaven/salmon-sync@v1
+        with:
+          source: docs/src
+          destination: deephaven/barrage/${{ steps.version.outputs.version }}
+          production: true
+          temporary: false
+          aws-role: ${{ vars.DOCS_AWS_ROLE }}

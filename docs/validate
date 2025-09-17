@@ -1,0 +1,31 @@
+#!/bin/bash
+
+usage() {
+  echo "Usage: $0"
+  echo "Validates the docs build, sidebar.json files are correct, and links are correct."
+  echo
+  echo "Options:"
+  echo "  -h        Show this help message"
+}
+
+EXTERNAL=false
+while getopts ":eh" opt; do
+  case $opt in
+    h)
+      usage
+      exit 0
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+
+done
+
+pushd "$(dirname "$0")" > /dev/null # Set pwd to this directory
+docker run --pull always --tty -e EXTERNAL=true -e ABSOLUTE=true -e HEADINGS=true -v ./src:/validate -v ./validator-results:/results ghcr.io/deephaven/salmon-validator:1
+EXIT_CODE=$?
+popd > /dev/null # Reset pwd
+
+exit $EXIT_CODE
