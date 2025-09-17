@@ -19,6 +19,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
+          distribution: "temurin"
           java-version: "17.0.11"
 
       - name: Package with Maven
