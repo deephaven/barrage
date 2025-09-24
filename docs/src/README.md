@@ -3,8 +3,6 @@ title: Barrage
 slug: /docs
 ---
 
-Test
-
 <div className="comment-title">
 
 Barrage is an extension of Apache Arrow Flight, with a particular focus on incrementally updating data sets.
