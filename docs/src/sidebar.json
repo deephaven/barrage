@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/deephaven/salmon-sync/refs/heads/main/sidebar.schema.json",
+  "config": {
+    "name": "Deephaven Barrage Docs"
+  },
+  "sidebars": {
+    "main": [
+      {
+        "label": "Introduction",
+        "path": "README.md"
+      },
+      {
+        "label": "Concepts",
+        "path": "concepts.md"
+      },
+      {
+        "label": "RPC Interface",
+        "path": "rpc-interface.md"
+      },
+      {
+        "label": "Wire Guide",
+        "path": "wire-guide.md"
+      }
+    ]
+  }
+}

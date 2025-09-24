@@ -2,24 +2,25 @@ name: Package CI
 
 on:
   pull_request:
-    branches: [ 'main' ]
+    branches: ["main"]
   push:
-    branches: [ 'main' ]
+    branches: ["main"]
 
 jobs:
   barrage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           # The maven git-commit-id-plugin needs the history
           fetch-depth: 0
 
       - name: Setup JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v5
         with:
-          java-version: '17.0.11'
+          distribution: "temurin"
+          java-version: "17.0.11"
 
       - name: Package with Maven
         run: mvn --file java/pom.xml --batch-mode package
