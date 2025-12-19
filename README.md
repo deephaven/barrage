@@ -10,9 +10,9 @@ See documentation here: https://deephaven.io/barrage/docs/
 
 ### Versioning
 Every Flatbuffers version is technically a breaking change, so our use of semver for this project may make
-it seem as though this project seems more changes than it actually does. In reality, changes to the barrage
+it seem as though this project sees more changes than it actually does. In reality, changes to the barrage
 wire format are quite infrequent, and always done in an attempt to be backwards compatible. As a result,
-SemVer applies specifically for using this as a library, but two endpoints can still communicate with version,
+SemVer applies specifically for using this as a library, but two endpoints can still communicate with different versions,
 though new features used by one endpoint may not be understood by an older endpoint.
 
 As such, our versioning scheme is as follows:
