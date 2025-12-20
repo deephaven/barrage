@@ -19,7 +19,7 @@
 
   <groupId>io.deephaven.barrage</groupId>
   <artifactId>barrage-java-root</artifactId>
-  <version>1.0.0</version>
+  <version>HEAD-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Deephaven Data Labs' Barrage Java Root POM</name>
